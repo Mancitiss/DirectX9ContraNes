@@ -1,4 +1,6 @@
 #include "ContraApp.h"
+#include "d3dUtil.h"
+#include "GameSprite.h"
 
 namespace
 {
@@ -22,7 +24,7 @@ ContraApp::ContraApp(HINSTANCE hInstance)
 	m_uiClientWidth = 800;
 	m_uiClientHeight = 600;
 	m_strAppTitle = "ContraNes";
-	m_LAppTitle = L"ContraNes";
+	m_LAppTitle = ConvertToLPCWSTR(m_strAppTitle);
 	m_WindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 	g_pApp = this;
 }
@@ -45,15 +47,20 @@ int ContraApp::Run()
 		}
 		else
 		{
-			// update 
-			Update(0.0f);
-
-			// render
-			Render();
+			this->_Run();
 		}
 	}
 
 	return static_cast<int>(msg.wParam);
+}
+
+void ContraApp::_Run()
+{
+	// update game
+	Update(0.0f);
+
+	// render game
+	Render(0.0f);
 }
 
 bool ContraApp::Init()

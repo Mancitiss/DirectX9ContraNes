@@ -13,10 +13,12 @@ public:
 	// main application loop
 	int Run();
 
+	virtual void _Run();
+
 	// framework methods
 	virtual bool Init();
 	virtual void Update(float dt) = 0;
-	virtual void Render() = 0;
+	virtual void Render(float gameTime) = 0;
 	LRESULT CALLBACK MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 protected:
@@ -28,6 +30,8 @@ protected:
 	std::string		m_strAppTitle;
 	LPCWSTR 	    m_LAppTitle;
 	DWORD			m_WindowStyle;
+	int				m_prevX;
+	int				m_prevY;
 
 	// directx attributes
 	IDirect3D9*				m_pDirect3D;

@@ -1,5 +1,6 @@
 #pragma once
 #include <d3d9.h>
+#include <string>
 
 namespace d3dColors
 {
@@ -21,5 +22,7 @@ namespace d3dColors
 	const D3DCOLOR Silver = D3DCOLOR_ARGB(255, 192, 192, 192);
 	
 	const D3DCOLOR Transparent = D3DCOLOR_ARGB(0, 0, 0, 0);
-
+	
 }
+
+LPCWSTR ConvertToLPCWSTR(const std::string& str);
