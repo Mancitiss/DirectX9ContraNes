@@ -31,7 +31,18 @@ ContraApp::ContraApp(HINSTANCE hInstance)
 
 ContraApp::~ContraApp()
 {
-	// release objects from memory
+	// release Direct3D
+	if (m_pDevice3D) {
+		m_pDevice3D->Release();
+		m_pDevice3D = NULL;
+	}
+
+	if (m_pDirect3D) 
+	{
+		m_pDirect3D->Release();
+		m_pDirect3D = NULL; 
+	}
+
 }
 
 int ContraApp::Run()
@@ -157,19 +168,8 @@ bool ContraApp::InitDirect3D()
 
 	// fill out the present parameters
 	ZeroMemory(&m_d3dpp, sizeof(D3DPRESENT_PARAMETERS));
-	m_d3dpp.BackBufferWidth = m_uiClientWidth;
-	m_d3dpp.BackBufferHeight = m_uiClientHeight;
 	m_d3dpp.Windowed = TRUE;
-	m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
-	m_d3dpp.BackBufferCount = 1;
-	m_d3dpp.MultiSampleType = D3DMULTISAMPLE_NONE;
-	m_d3dpp.MultiSampleQuality = 0;
 	m_d3dpp.hDeviceWindow = m_hAppWnd;
-	m_d3dpp.Flags = 0;
-	m_d3dpp.EnableAutoDepthStencil = TRUE;
-	m_d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
-	m_d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
-	m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 	m_d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	
 	// create device
@@ -189,7 +189,7 @@ bool ContraApp::InitDirect3D()
 		return false;
 	}
 
-	D3DVIEWPORT9 viewport;
+	/*D3DVIEWPORT9 viewport;
 	ZeroMemory(&viewport, sizeof(D3DVIEWPORT9));
 	viewport.X = 0;
 	viewport.Y = 0;
@@ -198,7 +198,7 @@ bool ContraApp::InitDirect3D()
 	viewport.MinZ = 0.0f;
 	viewport.MaxZ = 1.0f;
 
-	m_pDevice3D->SetViewport(&viewport);
+	m_pDevice3D->SetViewport(&viewport);*/
 
 	return true;
 }
@@ -213,4 +213,9 @@ LRESULT CALLBACK ContraApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+IDirect3DDevice9* ContraApp::GetDevice() const
+{
+	return m_pDevice3D;
 }

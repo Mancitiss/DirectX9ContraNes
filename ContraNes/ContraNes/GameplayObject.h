@@ -21,9 +21,9 @@ public:
 
 	ObjectStatus GetStatus() const;
 	GameSprite* GetSprite() const;
-	D3DXVECTOR3* GetPosition() const;
 
 	void SetSpeed(float speed);
+	D3DXVECTOR3 GetPosition() const;
 
 	bool IsInitialized() const;
 

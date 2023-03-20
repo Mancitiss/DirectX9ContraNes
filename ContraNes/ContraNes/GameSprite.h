@@ -9,13 +9,15 @@ class GameSprite
 {
 public:
 	GameSprite();
+	GameSprite(float x, float y);
 	~GameSprite();
 
 	// methods
 	bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height);
 	bool IsInitialized();
-	void Draw(float dt, D3DXVECTOR3 position);
+	void Draw(D3DXVECTOR3 *position);
 	LPDIRECT3DTEXTURE9 GetTexture() const;
+	D3DXVECTOR3 GetPosition() const;
 
 	// attributes
 	int spriteWidth;
@@ -28,6 +30,7 @@ private:
 
 	D3DCOLOR color;
 
+	D3DXVECTOR3 position;
 
 	bool initialized;
 };

@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <d3d9.h>
 #include <string>
+#include <d3dx9.h>
 
 class ContraApp
 {
@@ -12,6 +13,8 @@ public:
 
 	// main application loop
 	int Run();
+
+	IDirect3DDevice9* GetDevice() const;
 
 	virtual void _Run();
 
@@ -34,8 +37,8 @@ protected:
 	int				m_prevY;
 
 	// directx attributes
-	IDirect3D9*				m_pDirect3D;
-	IDirect3DDevice9*		m_pDevice3D;
+	LPDIRECT3D9				m_pDirect3D;
+	LPDIRECT3DDEVICE9		m_pDevice3D;
 	D3DPRESENT_PARAMETERS	m_d3dpp;
 
 	// methods

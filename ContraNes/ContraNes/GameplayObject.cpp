@@ -86,7 +86,7 @@ void GameplayObject::Update(float gameTime)
 void GameplayObject::Draw(float dt)
 {
 	if (sprite) {
-		sprite->Draw(dt, position);
+		sprite->Draw(&position);
 	}
 }
 
@@ -111,12 +111,10 @@ GameSprite* GameplayObject::GetSprite() const
 	return sprite;
 }
 
-D3DXVECTOR3* GameplayObject::GetPosition() const
+D3DXVECTOR3 GameplayObject::GetPosition() const
 {
-	return (D3DXVECTOR3*)&position;
+	return position;
 }
-
-
 
 void GameplayObject::HandleInput()
 {

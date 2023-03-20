@@ -2,6 +2,7 @@
 #include "ContraApp.h"
 #include "GameplayObject.h"
 #include "GameTime.h"
+#include "Camera.h"
 
 class App : public ContraApp
 {
@@ -23,7 +24,17 @@ public:
 	// initilize game objects
 	bool InitObjects();
 
+private:
+	Camera* camera;
+
+	GameplayObject* background;
 	GameplayObject* player;
 
 	GameTime* gameTime;
+	ID3DXFont* font;
+	LPCWSTR message;
+	RECT messageRect;
+
+	int width;
+	int height;
 };

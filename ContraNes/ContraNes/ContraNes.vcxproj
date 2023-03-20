@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ContraApp.cpp" />
     <ClCompile Include="d3dUtil.cpp" />
     <ClCompile Include="GameplayObject.cpp" />
@@ -148,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="ContraApp.h" />
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="GameplayObject.h" />

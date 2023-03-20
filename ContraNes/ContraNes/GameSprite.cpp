@@ -60,15 +60,15 @@ bool GameSprite::IsInitialized()
 	return initialized;
 }
 
-void GameSprite::Draw(float dt, D3DXVECTOR3 position)
+void GameSprite::Draw(D3DXVECTOR3* position)
 {
 	if (sprite && tex)
 	{
 		// begin the sprite
-		sprite->Begin(D3DXSPRITE_ALPHABLEND);
+		sprite->Begin(D3DXSPRITE_ALPHABLEND || D3DXSPRITE_OBJECTSPACE);
 
 		// draw the sprite
-		sprite->Draw(tex, NULL, NULL, &position, color);
+		sprite->Draw(tex, NULL, NULL, position, color);
 
 		// end the sprite
 		sprite->End();
@@ -78,4 +78,9 @@ void GameSprite::Draw(float dt, D3DXVECTOR3 position)
 LPDIRECT3DTEXTURE9 GameSprite::GetTexture() const
 {
 	return tex;
+}
+
+D3DXVECTOR3 GameSprite::GetPosition() const
+{
+	return position;
 }
