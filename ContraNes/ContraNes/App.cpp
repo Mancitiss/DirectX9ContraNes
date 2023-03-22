@@ -1,7 +1,7 @@
 #define _USE_MATH_DEFINES
 #include<cmath>
 #include <d3dx9.h>
-
+#include "Keyboard.h"
 #include "App.h"
 #include "d3dUtil.h"
 
@@ -52,16 +52,16 @@ ID3DXSprite* pSprite;
 bool App::InitObjects()
 {
 
-	background = new GameplayObject(0, 0, 1, 0, 0, 0);
-	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480, 0, D3DCOLOR_ARGB(255, 248, 255, 0))) return false;
-	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth, background->GetSprite()->spriteHeight);
+	background = new GameplayObject(0, 0, 1.0f, 0, 0, 0);
+	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
+	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth * 1.0f, background->GetSprite()->spriteHeight * 1.0f);
 
 	player = new GameplayObject(5, 5, 0, (float)0, 300, 300);
-	if (!player->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, M_PI, D3DCOLOR_ARGB(0, 0, 0, 0))) return false;
+	if (!player->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI, D3DCOLOR_ARGB(0, 0, 0, 0))) return false;
 	player->SetJerkIncrementPerSecond3(19702.0f);
 
 	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300);
-	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, M_PI)) return false;
+	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI)) return false;
 	return true;
 }
 

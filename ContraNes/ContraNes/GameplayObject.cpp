@@ -1,5 +1,5 @@
 
-
+#include "Keyboard.h"
 #include "GameplayObject.h"
 
 
@@ -21,11 +21,14 @@ GameplayObject::GameplayObject(float x, float y, float rotation, float speed, fl
 	velocity.x = cos(rotation) * speed;
 	velocity.y = sin(rotation) * speed;
 	velocity.z = 0;
-	
+
+	currentAcceleration = 0;
+	currentJerk = 0;
 }
 
 GameplayObject::GameplayObject(float x, float y, float z, float rotation, float speed, float maxSpeed)
 {
+	// NOTE: because the y axis is inverted, the PI circle is actually go clockwise instead of counter clockwise
 	float two_pi = (float)(M_PI * 2.0f);
 	this->position = D3DXVECTOR3(x, y, z);
 	this->rotation = (rotation > two_pi) ? rotation - two_pi : rotation;
@@ -134,25 +137,25 @@ void GameplayObject::HandleInput(float gameTime)
 	D3DXVECTOR3 movementVector(0, 0, 0);
 
 	// if the up arrow is pressed, move the sprite up
-	if (GetAsyncKeyState(VK_UP))
+	if (GetAsyncKeyState(Keyboard::UP))
 	{
 		movementVector.y -= 1;
 	}
 
 	// if the down arrow is pressed, move the sprite down
-	if (GetAsyncKeyState(VK_DOWN))
+	if (GetAsyncKeyState(Keyboard::DOWN))
 	{
 		movementVector.y += 1;
 	}
 
 	// if the left arrow is pressed, move the sprite left
-	if (GetAsyncKeyState(VK_LEFT))
+	if (GetAsyncKeyState(Keyboard::LEFT))
 	{
 		movementVector.x -= 1;
 	}
 
 	// if the right arrow is pressed, move the sprite right
-	if (GetAsyncKeyState(VK_RIGHT))
+	if (GetAsyncKeyState(Keyboard::RIGHT))
 	{
 		movementVector.x += 1;
 	}

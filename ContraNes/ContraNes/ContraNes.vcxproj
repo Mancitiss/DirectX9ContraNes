@@ -145,6 +145,7 @@
     <ClCompile Include="GameplayObject.cpp" />
     <ClCompile Include="GameSprite.cpp" />
     <ClCompile Include="GameTime.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +156,7 @@
     <ClInclude Include="GameplayObject.h" />
     <ClInclude Include="GameSprite.h" />
     <ClInclude Include="GameTime.h" />
+    <ClInclude Include="Keyboard.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
