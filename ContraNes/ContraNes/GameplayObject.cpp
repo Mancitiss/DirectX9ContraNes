@@ -56,7 +56,7 @@ GameplayObject::~GameplayObject()
 	}
 }
 
-bool GameplayObject::Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height, float baseZRotation)
+bool GameplayObject::Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height, float baseZRotation, D3DCOLOR backColor, D3DCOLOR displayColor)
 {
 	status = ObjectStatus::Active;
 	if (!sprite) {

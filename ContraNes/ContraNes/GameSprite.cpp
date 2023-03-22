@@ -1,10 +1,10 @@
 #include "GameSprite.h"
 #include "d3dUtil.h"
-
+#include <DxErr.h>
 GameSprite::GameSprite()
 {
 	// when color is set to white, the sprite will be drawn with its original color
-	color = D3DCOLOR_ARGB(255, 255, 255, 255);
+	// color = D3DCOLOR_ARGB(255, 255, 255, 255);
 
 	// sprite is not initialized
 	initialized = false;
@@ -21,18 +21,34 @@ GameSprite::~GameSprite()
 		sprite->Release();
 }
 
-bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height, float baseZRotation)
+bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height, float baseZRotation, D3DCOLOR backColor, D3DCOLOR displayColor)
 {
 	// same functionality as D3DXCreateTextureFromFile EXCEPT it allows you to specify the width and height
 	// this is useful for sprites that are not a power of 2
 
-	if (!SUCCEEDED(D3DXCreateTextureFromFileEx(device, rss, width, height,
-		1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, D3DCOLOR_ARGB(0, 0, 0, 0),
+	/*if (!SUCCEEDED(D3DXCreateTextureFromFileEx(device, rss, width, height,
+		1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, backColor, 
 		NULL, NULL, &tex)))
 	{
 		MessageBox(NULL, L"There was an error loading the texture", L"Error", MB_OK);
 		return false;
+	}*/
+
+	HRESULT hr = D3DXCreateTextureFromFileEx(device, rss, width, height,
+		1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, backColor,
+		NULL, NULL, &tex);
+	if (FAILED(hr))
+	{
+		LPCWSTR errorText = L"Error loading texture: ";
+		wchar_t errorMsg[MAX_PATH];
+		wcscpy_s(errorMsg, MAX_PATH, errorText);
+		wcscat_s(errorMsg, MAX_PATH, DXGetErrorString(hr));
+		MessageBox(NULL, errorMsg, L"Error", MB_OK);
+		return false;
 	}
+
+	this->backColor = backColor;
+	this->displayColor = displayColor;
 
 
 	// attempt to create the sprite
@@ -69,7 +85,7 @@ void GameSprite::Draw(D3DXVECTOR3* position)
 		sprite->Begin(D3DXSPRITE_ALPHABLEND);
 
 		// draw the sprite
-		sprite->Draw(tex, NULL, NULL, position, color);
+		sprite->Draw(tex, NULL, NULL, position, displayColor);
 
 		// end the sprite
 		sprite->End();
@@ -95,7 +111,7 @@ void GameSprite::Draw(D3DXVECTOR3* position, float rotation)
 		sprite->Begin( D3DXSPRITE_DONOTSAVESTATE | D3DXSPRITE_SORT_DEPTH_FRONTTOBACK | D3DXSPRITE_ALPHABLEND );
 
 		// draw the sprite
-		sprite->Draw(tex, NULL, NULL, position, color);
+		sprite->Draw(tex, NULL, NULL, position, displayColor);
 
 		// end the sprite
 		sprite->End();
@@ -112,4 +128,9 @@ LPDIRECT3DTEXTURE9 GameSprite::GetTexture() const
 D3DXVECTOR3 GameSprite::GetPosition() const
 {
 	return position;
+}
+
+void GameSprite::SetDisplayColor(D3DCOLOR color)
+{
+	displayColor = color;
 }

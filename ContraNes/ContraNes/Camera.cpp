@@ -13,16 +13,75 @@ Camera::Camera(int x, int y, int z, int width, int height, float angle, DirectX:
 
 Camera::~Camera()
 {
+	if (limits != nullptr)
+	{
+		delete limits;
+		limits = nullptr;
+	}
+}
+
+void Camera::SetLimit(float x, float y, float width, float height)
+{
+	if (limits == nullptr)
+	{
+		limits = new RECT();
+	}
+
+	limits->left = x;
+	limits->top = y;
+	limits->right = x + width;
+	limits->bottom = y + height;
+
+	if (width <= this->width) {
+		this->lockX = true;
+		this->position.x = x + width / 2 - this->width / 2;
+	}
+	else this->lockX = false;
+
+	if (height <= this->height) {
+		this->lockY = true;
+		this->position.y = y + height / 2 - this->height / 2;
+	}
+	else this->lockY = false;
 }
 
 void Camera::Update(float dt)
 {
 	if (this->following && this->following->IsInitialized()) {
-		this->position.x = this->following->GetPosition().x - width / 2;
-		this->position.y = this->following->GetPosition().y - height / 2;
+		if (!this->lockX) {
+			float x = this->following->GetPosition().x - width / 2; 
+			if (limits != nullptr)
+			{
+				if (x < limits->left)
+				{
+					x = limits->left;
+				}
+				else if (x + width > limits->right)
+				{
+					x = limits->right - width;
+				}
+			}
+			this->position.x = x;
+		}
+
+		if (!this->lockY) {
+			float y = this->following->GetPosition().y - height / 2;
+			if (limits != nullptr)
+			{
+				if (y < limits->top)
+				{
+					y = limits->top;
+				}
+				else if (y + height > limits->bottom)
+				{
+					y = limits->bottom - height;
+				}
+			}
+			this->position.y = y;
+		}
 	}
 
-	OutputDebugString(ConvertToLPCWSTR("" + std::to_string(position.x) + ", " + std::to_string(position.y) +"\n"));
+	//OutputDebugString(ConvertToLPCWSTR("" + std::to_string(position.x) + ", " + std::to_string(position.y) +"\n"));
 }
 
 void Camera::Follow(GameplayObject* following)

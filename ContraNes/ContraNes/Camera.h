@@ -15,6 +15,7 @@ public:
 	bool IsFollowing() const;
 	void Render(GameplayObject* object, float gameTime = 0);
 	void Render(GameSprite* sprite, float gameTime = 0);
+	void SetLimit(float x, float y, float width, float height);
 
 	D3DXMATRIX transformationMatrix;
 
@@ -25,4 +26,6 @@ private:
 	D3DXVECTOR3 position;
 	DirectX::XMFLOAT3 scaleFactors;
 	GameplayObject* following;
+	RECT* limits;
+	bool lockX, lockY;
 };

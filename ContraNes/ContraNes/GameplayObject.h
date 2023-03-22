@@ -15,7 +15,7 @@ public:
 	~GameplayObject();
 
 	virtual void HandleInput(float gameTime);
-	virtual bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height, float baseZRotation = 0);
+	virtual bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height, float baseZRotation = 0, D3DCOLOR backColor = D3DCOLOR_ARGB(0, 0, 0, 0), D3DCOLOR displayColor = D3DCOLOR_ARGB(255, 255, 255, 255));
 	virtual void Update(float dt);
 	virtual void Draw(float dt);
 	virtual void Draw(D3DXVECTOR3* position, float dt);

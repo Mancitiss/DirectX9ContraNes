@@ -53,11 +53,12 @@ bool App::InitObjects()
 {
 
 	background = new GameplayObject(0, 0, 1, 0, 0, 0);
-	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
+	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480, 0, D3DCOLOR_ARGB(255, 248, 255, 0))) return false;
+	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth, background->GetSprite()->spriteHeight);
 
-	player = new GameplayObject(5, 5, 0, (float)0, 300, 999999);
-	if (!player->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, M_PI)) return false;
-	player->SetJerkIncrementPerSecond3(1.0f);
+	player = new GameplayObject(5, 5, 0, (float)0, 300, 300);
+	if (!player->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, M_PI, D3DCOLOR_ARGB(0, 0, 0, 0))) return false;
+	player->SetJerkIncrementPerSecond3(19702.0f);
 
 	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300);
 	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, M_PI)) return false;
