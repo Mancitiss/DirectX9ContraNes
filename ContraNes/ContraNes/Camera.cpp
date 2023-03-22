@@ -40,15 +40,15 @@ bool Camera::IsFollowing() const
 	return this->following != nullptr;
 }
 
-void Camera::Render(GameplayObject* object)
+void Camera::Render(GameplayObject* object, float gameTime)
 {
 	if (object->IsInitialized()) {
 		D3DXVECTOR3 relativePosition = object->GetPosition() - this->position;
-		object->GetSprite()->Draw(&relativePosition);
+		object->Draw(&relativePosition, gameTime);
 	}
 }
 
-void Camera::Render(GameSprite* sprite)
+void Camera::Render(GameSprite* sprite, float gameTime)
 {
 	if (sprite->IsInitialized()) {
 		D3DXVECTOR3 relativePosition = sprite->GetPosition() - this->position;

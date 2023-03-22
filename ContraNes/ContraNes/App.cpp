@@ -55,8 +55,12 @@ bool App::InitObjects()
 	background = new GameplayObject(0, 0, 1, 0, 0, 0);
 	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
 
-	player = new GameplayObject(5, 5, 0, (float)M_PI_4, 300, 300);
-	if (!player->Init(m_pDevice3D, L"resources/tank.png", 67, 68)) return false;
+	player = new GameplayObject(5, 5, 0, (float)0, 300, 999999);
+	if (!player->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, M_PI)) return false;
+	player->SetJerkIncrementPerSecond3(1.0f);
+
+	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300);
+	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, M_PI)) return false;
 	return true;
 }
 
@@ -103,8 +107,14 @@ void App::Update(float gameTime)
 
 	if (player && player->IsInitialized())
 	{
-		player->HandleInput();
+		player->HandleInput(gameTime);
 		player->Update(gameTime);
+
+	}
+
+	if (player2 && player2->IsInitialized())
+	{
+		player2->Update(gameTime);
 
 	}
 
@@ -144,6 +154,11 @@ void App::Render(float gameTime)
 		if (player && player->IsInitialized())
 		{
 			camera->Render(player);
+		}
+
+		if (player2 && player2->IsInitialized())
+		{
+			camera->Render(player2);
 		}
 	}
 

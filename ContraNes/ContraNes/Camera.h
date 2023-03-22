@@ -13,8 +13,8 @@ public:
 	void Follow(GameplayObject* following);
 	void Unfollow();
 	bool IsFollowing() const;
-	void Render(GameplayObject* object);
-	void Render(GameSprite* sprite);
+	void Render(GameplayObject* object, float gameTime = 0);
+	void Render(GameSprite* sprite, float gameTime = 0);
 
 	D3DXMATRIX transformationMatrix;
 

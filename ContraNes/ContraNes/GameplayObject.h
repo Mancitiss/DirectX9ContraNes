@@ -14,10 +14,11 @@ public:
 
 	~GameplayObject();
 
-	virtual void HandleInput();
-	virtual bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height);
+	virtual void HandleInput(float gameTime);
+	virtual bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height, float baseZRotation = 0);
 	virtual void Update(float dt);
 	virtual void Draw(float dt);
+	virtual void Draw(D3DXVECTOR3* position, float dt);
 
 	ObjectStatus GetStatus() const;
 	GameSprite* GetSprite() const;
@@ -27,6 +28,8 @@ public:
 
 	bool IsInitialized() const;
 
+	void SetJerkIncrementPerSecond3(float jerk);
+
 protected:
 	LPCTSTR Name;
 	LPCTSTR Description;
@@ -35,11 +38,15 @@ protected:
 	D3DXVECTOR3 position;
 	D3DXVECTOR3 velocity;
 	float rotation;
-	float speed;
 
 	ObjectStatus status;
 	GameSprite* sprite;
 	float maxSpeed;
 
 	bool initialized;
+
+	float currentVelocity;
+	float currentAcceleration;
+	float currentJerk;
+	float jerkIncrementPerSecond3;
 };

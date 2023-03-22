@@ -13,9 +13,10 @@ public:
 	~GameSprite();
 
 	// methods
-	bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height);
+	bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height, float baseZRotation = 0);
 	bool IsInitialized();
 	void Draw(D3DXVECTOR3 *position);
+	void Draw(D3DXVECTOR3 *position, float rotation);
 	LPDIRECT3DTEXTURE9 GetTexture() const;
 	D3DXVECTOR3 GetPosition() const;
 
@@ -33,4 +34,5 @@ private:
 	D3DXVECTOR3 position;
 
 	bool initialized;
+	float baseZRotation;
 };

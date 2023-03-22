@@ -28,7 +28,7 @@ private:
 	Camera* camera;
 
 	GameplayObject* background;
-	GameplayObject* player;
+	GameplayObject* player, *player2;
 
 	GameTime* gameTime;
 	ID3DXFont* font;

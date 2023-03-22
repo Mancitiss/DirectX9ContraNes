@@ -21,8 +21,8 @@ ContraApp::ContraApp(HINSTANCE hInstance)
 {
 	m_hAppInstance = hInstance;
 	m_hAppWnd = NULL;
-	m_uiClientWidth = 800;
-	m_uiClientHeight = 600;
+	m_uiClientWidth = 640;
+	m_uiClientHeight = 480;
 	m_strAppTitle = "ContraNes";
 	m_LAppTitle = ConvertToLPCWSTR(m_strAppTitle);
 	m_WindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;

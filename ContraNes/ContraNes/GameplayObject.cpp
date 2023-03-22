@@ -11,17 +11,16 @@ GameplayObject::GameplayObject(float x, float y, float rotation, float speed, fl
 	this->maxSpeed = maxSpeed;
 	if (0 <= speed && speed <= maxSpeed)
 	{
-		this->speed = speed;
+		this->currentVelocity = speed;
 	}
 	else
 	{
-		this->speed = 0;
+		this->currentVelocity = maxSpeed;
 	}
 
 	velocity.x = cos(rotation) * speed;
 	velocity.y = sin(rotation) * speed;
 	velocity.z = 0;
-
 	
 }
 
@@ -33,16 +32,19 @@ GameplayObject::GameplayObject(float x, float y, float z, float rotation, float 
 	this->maxSpeed = maxSpeed;
 	if (0 <= speed && speed <= maxSpeed)
 	{
-		this->speed = speed;
+		this->currentVelocity = speed;
 	}
 	else
 	{
-		this->speed = 0;
+		this->currentVelocity = maxSpeed;
 	}
 
 	velocity.x = cos(rotation) * speed;
 	velocity.y = sin(rotation) * speed;
 	velocity.z = 0;
+
+	currentAcceleration = 0;
+	currentJerk = 0;
 }
 
 GameplayObject::~GameplayObject()
@@ -54,12 +56,12 @@ GameplayObject::~GameplayObject()
 	}
 }
 
-bool GameplayObject::Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height)
+bool GameplayObject::Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height, float baseZRotation)
 {
 	status = ObjectStatus::Active;
 	if (!sprite) {
 		sprite = new GameSprite();
-		if (!sprite->Init(device, file, width, height))
+		if (!sprite->Init(device, file, width, height, baseZRotation))
 		{
 			return false;
 		}
@@ -86,7 +88,16 @@ void GameplayObject::Update(float gameTime)
 void GameplayObject::Draw(float dt)
 {
 	if (sprite) {
+		
 		sprite->Draw(&position);
+	}
+}
+
+void GameplayObject::Draw(D3DXVECTOR3* position, float dt)
+{
+	if (sprite) {
+
+		sprite->Draw(position, rotation);
 	}
 }
 
@@ -99,7 +110,9 @@ void GameplayObject::SetSpeed(float speed)
 {
 	if (0 <= speed && speed <= maxSpeed)
 	{
-		this->speed = speed;
+		this->currentVelocity = speed;
+		this->currentJerk = 0;
+		this->currentAcceleration = 0;
 		velocity.x = cos(rotation) * speed;
 		velocity.y = sin(rotation) * speed;
 		velocity.z = 0;
@@ -116,7 +129,7 @@ D3DXVECTOR3 GameplayObject::GetPosition() const
 	return position;
 }
 
-void GameplayObject::HandleInput()
+void GameplayObject::HandleInput(float gameTime)
 {
 	D3DXVECTOR3 movementVector(0, 0, 0);
 
@@ -146,14 +159,24 @@ void GameplayObject::HandleInput()
 
 	if (movementVector.x != 0 || movementVector.y != 0)
 	{
-		float angle = atan2(movementVector.y, movementVector.x);
-
-		velocity.x = cos(angle) * speed;
-		velocity.y = sin(angle) * speed;
+		rotation = atan2(movementVector.y, movementVector.x);
+		currentJerk = min(currentJerk + jerkIncrementPerSecond3 * gameTime, maxSpeed/(gameTime*gameTime));
+		currentAcceleration = min(currentAcceleration + currentJerk * gameTime,  maxSpeed/gameTime);
+		currentVelocity = min(currentVelocity + currentAcceleration * gameTime, maxSpeed);
+		velocity.x = cos(rotation) * currentVelocity;
+		velocity.y = sin(rotation) * currentVelocity;
 	}
 	else
 	{
 		velocity.x = 0;
 		velocity.y = 0;
+		currentVelocity = 0;
+		currentAcceleration = 0;
+		currentJerk = 0;
 	}
+}
+
+void GameplayObject::SetJerkIncrementPerSecond3(float jerk)
+{
+	this->jerkIncrementPerSecond3 = jerk;
 }
