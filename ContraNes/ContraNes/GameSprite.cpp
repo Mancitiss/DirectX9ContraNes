@@ -115,7 +115,7 @@ void GameSprite::Draw(D3DXVECTOR3* position, float rotation)
 
 		// end the sprite
 		sprite->End();
-		OutputDebugString(ConvertToLPCWSTR("" + std::to_string(position->x) + ", " + std::to_string(position->y) + "," + std::to_string(position->z) + "\n"));
+		//OutputDebugString(ConvertToLPCWSTR("" + std::to_string(position->x) + ", " + std::to_string(position->y) + "," + std::to_string(position->z) + "\n"));
 
 	}
 }

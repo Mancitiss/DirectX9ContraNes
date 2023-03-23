@@ -4,6 +4,7 @@
 #include "Keyboard.h"
 #include "App.h"
 #include "d3dUtil.h"
+#include "Player.h"
 
 App::App(HINSTANCE hInstance) : ContraApp(hInstance)
 {
@@ -56,7 +57,7 @@ bool App::InitObjects()
 	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
 	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth * 1.0f, background->GetSprite()->spriteHeight * 1.0f);
 
-	player = new GameplayObject(5, 5, 0, (float)0, 300, 300);
+	player = new Player(5, 5, 0, (float)0, 300, 300);
 	if (!player->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI, D3DCOLOR_ARGB(0, 0, 0, 0))) return false;
 	player->SetJerkIncrementPerSecond3(19702.0f);
 

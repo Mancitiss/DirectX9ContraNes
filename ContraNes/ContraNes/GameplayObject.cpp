@@ -61,7 +61,7 @@ GameplayObject::~GameplayObject()
 
 bool GameplayObject::Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height, float baseZRotation, D3DCOLOR backColor, D3DCOLOR displayColor)
 {
-	status = ObjectStatus::Active;
+	status = ObjectStatus::ACTIVE;
 	if (!sprite) {
 		sprite = new GameSprite();
 		if (!sprite->Init(device, file, width, height, baseZRotation))
@@ -81,7 +81,7 @@ bool GameplayObject::IsInitialized() const
 
 void GameplayObject::Update(float gameTime)
 {
-	if (status == ObjectStatus::Active)
+	if (status == ObjectStatus::ACTIVE)
 	{
 		position.x += velocity.x * gameTime;
 		position.y += velocity.y * gameTime;
