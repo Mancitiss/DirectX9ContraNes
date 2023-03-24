@@ -3,6 +3,7 @@
 #include "GameplayObject.h"
 #include "GameTime.h"
 #include "Camera.h"
+#include "Player.h"
 
 class App : public ContraApp
 {
@@ -27,8 +28,8 @@ public:
 private:
 	Camera* camera;
 
-	GameplayObject* background;
-	GameplayObject* player, *player2;
+	GameplayObject* background, * player2;
+	Player* player;
 
 	GameTime* gameTime;
 	ID3DXFont* font;

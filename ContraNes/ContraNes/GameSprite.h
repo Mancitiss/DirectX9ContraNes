@@ -25,6 +25,9 @@ public:
 	int spriteWidth;
 	int spriteHeight;
 
+	GameSprite* pNext;
+	GameSprite* pDefault;
+
 private:
 	// attributes
 	LPDIRECT3DTEXTURE9 tex;

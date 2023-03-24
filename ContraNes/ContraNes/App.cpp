@@ -58,7 +58,7 @@ bool App::InitObjects()
 	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth * 1.0f, background->GetSprite()->spriteHeight * 1.0f);
 
 	player = new Player(5, 5, 0, (float)0, 300, 300);
-	if (!player->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI, D3DCOLOR_ARGB(0, 0, 0, 0))) return false;
+	if (!player->Init(m_pDevice3D)) return false;
 	player->SetJerkIncrementPerSecond3(19702.0f);
 
 	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300);

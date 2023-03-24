@@ -13,12 +13,21 @@ GameSprite::GameSprite()
 GameSprite::~GameSprite()
 {
 	// release the texture
-	if (tex != NULL)
-		tex->Release();
+	//if (tex != nullptr)
+	//	try {
+	//	tex = nullptr;
+	//}
+	//catch (...) {}
 
-	// release the sprite
-	if (sprite != NULL)
-		sprite->Release();
+	//// release the sprite
+	//if (sprite != nullptr)
+	//	try {
+	//	sprite = nullptr;
+	//} catch (...) {}
+
+	//if (pNext != nullptr) pNext = nullptr;
+	//if (pDefault != nullptr) pDefault = nullptr;
+
 }
 
 bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height, float baseZRotation, D3DCOLOR backColor, D3DCOLOR displayColor)
@@ -43,6 +52,8 @@ bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int heig
 		wchar_t errorMsg[MAX_PATH];
 		wcscpy_s(errorMsg, MAX_PATH, errorText);
 		wcscat_s(errorMsg, MAX_PATH, DXGetErrorString(hr));
+		wcscat_s(errorMsg, MAX_PATH, L" ");
+		wcscat_s(errorMsg, MAX_PATH, rss);
 		MessageBox(NULL, errorMsg, L"Error", MB_OK);
 		return false;
 	}

@@ -5,7 +5,6 @@
 #include<string>
 
 enum class ObjectStatus {ACTIVE, DYING, DEAD};
-enum class JumpStatus {JUMPING, IDLE};
 
 class GameplayObject
 {

@@ -1,6 +1,8 @@
 #pragma once
 #include <d3d9.h>
 #include <string>
+#include <fstream>
+#include "GameSprite.h"
 
 namespace d3dColors
 {
@@ -26,3 +28,7 @@ namespace d3dColors
 }
 
 LPCWSTR ConvertToLPCWSTR(const std::string& str);
+
+void GetPngImageDimensions(std::string& file_path, unsigned int& width, unsigned int& height);
+
+bool CreateSprites(LPDIRECT3DDEVICE9 device, int N, const std::string& prefix, const std::string& ext, GameSprite*& first, GameSprite*& pDefault);
