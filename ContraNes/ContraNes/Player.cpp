@@ -2,6 +2,7 @@
 #include "Keyboard.h"
 #include "d3dUtil.h"
 #include "GameSprite.h"
+#include "d3dUtil.h"
 
 Player::Player(float x, float y) : GameplayObject(x, y, 0, 0, 0, 300.0f)
 {
@@ -32,131 +33,28 @@ Player::Player(float x, float y, float z, float rotation, float speed, float max
 
 Player::~Player()
 {
-	GameSprite* pCurrent;
-	GameSprite* pNext;
-	pCurrent = pMoveRight;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
+	DeleteCircularList(pMoveRight);
+	DeleteCircularList(pMoveLeft);
+	DeleteCircularList(pMoveUp);
+	DeleteCircularList(pMoveRightUp);
+	DeleteCircularList(pMoveRightDown);
+	DeleteCircularList(pMoveLeftUp);
+	DeleteCircularList(pMoveLeftDown);
+	DeleteCircularList(pJumpRight);
+	DeleteCircularList(pJumpLeft);
+	DeleteCircularList(pJumpUp);
+	DeleteCircularList(pIdleRight);
+	DeleteCircularList(pIdleLeft);
+	DeleteCircularList(pIdleUp);
+	DeleteCircularList(pIdleDownLeft);
+	DeleteCircularList(pIdleDownRight);
+	DeleteCircularList(pIdleUpLeft);
+	DeleteCircularList(pIdleUpRight);
 
-	pCurrent = pMoveLeft;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pMoveUp;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pMoveRightUp;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pMoveRightDown;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pMoveLeftUp;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pMoveLeftDown;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pJumpRight;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pJumpLeft;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pJumpUp;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pIdleRight;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pIdleLeft;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pIdleUp;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pIdleDownLeft;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pIdleDownRight;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pIdleUpLeft;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-	pCurrent = pIdleUpRight;
-	while (pCurrent != nullptr) {
-		pNext = pCurrent->pNext;
-		delete pCurrent;
-		pCurrent = pNext;
-	}
-
-
+	this->sprite = nullptr;
 }
 
-bool Player::Init(LPDIRECT3DDEVICE9 device)
+bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 {
 	status = ObjectStatus::ACTIVE;
 
@@ -189,8 +87,8 @@ bool Player::Init(LPDIRECT3DDEVICE9 device)
 		{
 			return false;
 		}
-		this->pIdleUpLeft->pDefault = this->pIdleUpLeft;
-		this->pIdleUpLeft->pNext = this->pIdleLeft;
+		this->pIdleUpLeft->pDefault = this->pIdleLeft;
+		this->pIdleUpLeft->pNext = this->pIdleUpLeft;
 	}
 
 	if (!this->pIdleUpRight)
@@ -310,6 +208,10 @@ bool Player::Init(LPDIRECT3DDEVICE9 device)
 		}
 	}
 	this->sprite = this->pIdleRight;
+
+	this->frameDelay = frameDelay;
+	this->frameTime = frameDelay;
+
 	this->initialized = true;
 	return true;
 }
@@ -383,6 +285,17 @@ void Player::HandleInput(float gameTime)
 		jumpVelocity -= gravitationalAcceleration * gameTime;
 	}
 	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gravitationalAcceleration) + " " + std::to_string(gameTime) + " " + std::to_string(jumpVelocity) + ", " + std::to_string(velocity.y) + ", " + std::to_string(0 + (jumpStatus == JumpStatus::JUMPING)) + "\n"));
+
+	if (this->frameTime <= 0)
+	{
+		this->frameTime = this->frameDelay;
+	}
+	else
+	{
+		this->frameTime -= gameTime;
+		return;
+	}
+
 
 	this->prev = this->sprite;
 

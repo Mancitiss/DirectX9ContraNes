@@ -24,7 +24,7 @@ public:
 	Player(float x, float y, float rotation, float speed, float maxSpeed);
 	Player(float x, float y, float z, float rotation, float speed, float maxSpeed);
 	~Player();
-	virtual bool Init(LPDIRECT3DDEVICE9 device);
+	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0);
 	virtual void HandleInput(float gameTime) override;
 	virtual void Update(float gameTime) override;
 	void SetGravitationalAcceleration(float g);
@@ -33,6 +33,9 @@ protected:
 	float gravitationalAcceleration;
 	float jumpVelocity;
 	JumpStatus jumpStatus;
+
+	float frameTime;
+	float frameDelay;
 
 	Waterlogged waterlogged;
 	bool lockXFacing, lockYFacing;

@@ -32,3 +32,35 @@ LPCWSTR ConvertToLPCWSTR(const std::string& str);
 void GetPngImageDimensions(std::string& file_path, unsigned int& width, unsigned int& height);
 
 bool CreateSprites(LPDIRECT3DDEVICE9 device, int N, const std::string& prefix, const std::string& ext, GameSprite*& first, GameSprite*& pDefault);
+
+template<typename T>
+void DeleteCircularList(T*& head) {
+	if (!head) return;
+
+	T* current = head;
+	T* next = nullptr;
+
+	// Handle 1 node case
+	if (head->pNext == head) {
+		delete head;
+		return;
+	}
+
+	T* pLast = head;
+	current = head->pNext;
+	pLast->pNext = nullptr;
+	/*while (pLast->pNext != head) {
+		pLast = pLast->pNext;
+	}
+	pLast->pNext = nullptr;*/
+
+	// Delete each node in the list
+	do {
+		next = current->pNext;
+		delete current;
+		current = next;
+	} while (current != head);
+
+	// Set head to null
+	head = nullptr;
+}

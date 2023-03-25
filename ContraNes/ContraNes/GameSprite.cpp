@@ -25,8 +25,8 @@ GameSprite::~GameSprite()
 	//	sprite = nullptr;
 	//} catch (...) {}
 
-	//if (pNext != nullptr) pNext = nullptr;
-	//if (pDefault != nullptr) pDefault = nullptr;
+	if (pNext != nullptr) pNext = nullptr;
+	if (pDefault != nullptr) pDefault = nullptr;
 
 }
 
