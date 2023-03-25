@@ -286,6 +286,8 @@ void Player::HandleInput(float gameTime)
 	}
 	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gravitationalAcceleration) + " " + std::to_string(gameTime) + " " + std::to_string(jumpVelocity) + ", " + std::to_string(velocity.y) + ", " + std::to_string(0 + (jumpStatus == JumpStatus::JUMPING)) + "\n"));
 
+	this->prev = this->sprite;
+
 	if (this->frameTime <= 0)
 	{
 		this->frameTime = this->frameDelay;
@@ -295,9 +297,6 @@ void Player::HandleInput(float gameTime)
 		this->frameTime -= gameTime;
 		return;
 	}
-
-
-	this->prev = this->sprite;
 
 	if (directionVector != currentDirection) {
 
