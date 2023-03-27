@@ -4,7 +4,7 @@
 #include "GameSprite.h"
 #include "d3dUtil.h"
 
-Player::Player(float x, float y) : GameplayObject(x, y, 0, 0, 0, 300.0f)
+Player::Player(float x, float y) : Character(x, y, 0, 0, 0, 300.0f)
 {
 	gravitationalAcceleration = 2000;
 	jumpVelocity = 0;
@@ -13,7 +13,7 @@ Player::Player(float x, float y) : GameplayObject(x, y, 0, 0, 0, 300.0f)
 	lockYFacing = true;
 }
 
-Player::Player(float x, float y, float rotation, float speed, float maxSpeed) : GameplayObject(x, y, rotation, speed, maxSpeed)
+Player::Player(float x, float y, float rotation, float speed, float maxSpeed) : Character(x, y, rotation, speed, maxSpeed)
 {
 	gravitationalAcceleration = 2000;
 	jumpVelocity = 0;
@@ -22,7 +22,7 @@ Player::Player(float x, float y, float rotation, float speed, float maxSpeed) : 
 	lockYFacing = true;
 }
 
-Player::Player(float x, float y, float z, float rotation, float speed, float maxSpeed) : GameplayObject(x, y, z, rotation, speed, maxSpeed)
+Player::Player(float x, float y, float z, float rotation, float speed, float maxSpeed) : Character(x, y, z, rotation, speed, maxSpeed)
 {
 	gravitationalAcceleration = 2000;
 	jumpVelocity = 0;
@@ -368,25 +368,59 @@ void Player::Update(float gameTime) {
 	if (status == ObjectStatus::ACTIVE)
 	{
 		position.x += velocity.x * gameTime;
-		if (/*(position.y > 480 - this->sprite->spriteHeight) && */jumpStatus == JumpStatus::JUMPING)
-		{
-			position.y += velocity.y * gameTime;
-			if (position.y > 480 - this->sprite->spriteHeight)
+		//if (jumpStatus == JumpStatus::JUMPING)
+		//{
+		position.y += velocity.y * gameTime;
+		/*	if (position.y > 480 - this->sprite->spriteHeight)
 			{
 				position.y = 480 - this->sprite->spriteHeight;
 				jumpStatus = JumpStatus::IDLE;
 			}
-			//OutputDebugString(ConvertToLPCWSTR("pos: " + std::to_string(position.x) + ", " + std::to_string(position.y) + "," + std::to_string(position.z) + "\n"));
 		}
-		else 
+		else
 		{
 			jumpVelocity = 0;
 			velocity.y = 0;
-		}
+		}*/
 
 		position.x += this->prev->spriteWidth / 2 - this->sprite->spriteWidth / 2;
 		position.y += this->prev->spriteHeight - this->sprite->spriteHeight;
 	}
+}
+
+void Player::SetPositionX(float x)
+{
+	this->position.x = x;
+}
+
+void Player::SetPositionY(float y)
+{
+	this->position.y = y;
+}
+
+void Player::SetPositionZ(float z)
+{
+	this->position.z = z;
+}
+
+D3DXVECTOR3 Player::GetVelocity() const
+{
+	return velocity;
+}
+
+void Player::SetVelocityX(float x)
+{
+	this->velocity.x = x;
+}
+
+void Player::SetVelocityY(float y)
+{
+	this->velocity.y = y;
+}
+
+void Player::SetVelocityZ(float z)
+{
+	this->velocity.z = z;
 }
 
 void Player::SetGravitationalAcceleration(float gravitationalAcceleration)
@@ -397,4 +431,14 @@ void Player::SetGravitationalAcceleration(float gravitationalAcceleration)
 void Player::SetJumpVelocity(float jumpVelocity)
 {
 	this->jumpVelocity = jumpVelocity;
+}
+
+void Player::SetJumpState(JumpStatus j)
+{
+	this->jumpStatus = j;
+}
+
+JumpStatus Player::GetJumpState() const
+{
+	return jumpStatus;
 }

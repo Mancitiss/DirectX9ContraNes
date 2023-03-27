@@ -72,3 +72,9 @@ bool CreateSprites(LPDIRECT3DDEVICE9 device, int N, const std::string& prefix, c
 
     return true;
 }
+
+bool CheckIntersection(RECT* const& rectA, RECT* const& rectB)
+{
+    return max(rectA->left, rectB->left) < min(rectA->right, rectB->right)
+        && max(rectA->top, rectB->top) < min(rectA->bottom, rectB->bottom);
+}

@@ -147,11 +147,13 @@
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="StandableObject.cpp" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Character.h" />
     <ClInclude Include="ContraApp.h" />
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="GameplayObject.h" />
@@ -159,6 +161,7 @@
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="StandableObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

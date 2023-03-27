@@ -29,7 +29,6 @@ public:
 	bool IsInitialized() const;
 
 	void SetJerkIncrementPerSecond3(float jerk);
-
 protected:
 	LPCTSTR Name;
 	LPCTSTR Description;

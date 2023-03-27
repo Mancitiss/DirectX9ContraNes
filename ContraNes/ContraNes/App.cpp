@@ -52,12 +52,14 @@ ID3DXSprite* pSprite;
 
 bool App::InitObjects()
 {
+	platforms.push_back(new StandableObject(-100,480,10000,1000, false));
+	platforms.push_back(new StandableObject(50, 200, 300, 50, true));
 
 	background = new GameplayObject(0, 0, 1.0f, 0, 0, 0);
 	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
 	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth * 1.0f, background->GetSprite()->spriteHeight * 1.0f);
 
-	player = new Player(5, 5, 0, (float)0, 300, 300);
+	player = new Player(100, 5, 0, (float)0, 300, 300);
 	if (!player->Init(m_pDevice3D, 0.15f)) return false;
 	player->SetJerkIncrementPerSecond3(19702.0f);
 
@@ -107,17 +109,29 @@ void App::Update(float gameTime)
 		PostQuitMessage(0);
 	}
 
-	if (player && player->IsInitialized())
-	{
-		player->HandleInput(gameTime);
-		player->Update(gameTime);
-
-	}
-
 	if (player2 && player2->IsInitialized())
 	{
 		player2->Update(gameTime);
 
+	}
+
+	if (player && player->IsInitialized())
+	{
+		player->HandleInput(gameTime);
+		player->Update(gameTime);
+	}
+	RECT playerRect = { (LONG)player->GetPosition().x, (LONG)player->GetPosition().y, (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
+	for (auto& platform : platforms)
+	{
+		RECT platformRect = platform->GetBounds();
+		OutputDebugString(ConvertToLPCWSTR(std::to_string(platformRect.left) + " " + std::to_string(platformRect.top) + " " + std::to_string(platformRect.right) + " " + std::to_string(platformRect.bottom) + "\n"));
+		OutputDebugString(ConvertToLPCWSTR("P: " + std::to_string(playerRect.left) + " " + std::to_string(playerRect.top) + " " + std::to_string(playerRect.right) + " " + std::to_string(playerRect.bottom) + "\n"));
+		// check collision
+		if ( CheckIntersection( &playerRect, &platformRect) )
+		{
+			OutputDebugStringW(L"alo");
+			platform->ApplyCollision(player, gameTime);
+		}
 	}
 
 	if (camera) {

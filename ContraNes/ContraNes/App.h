@@ -4,6 +4,8 @@
 #include "GameTime.h"
 #include "Camera.h"
 #include "Player.h"
+#include "StandableObject.h"
+#include <vector>
 
 class App : public ContraApp
 {
@@ -30,6 +32,8 @@ private:
 
 	GameplayObject* background, * player2;
 	Player* player;
+
+	std::vector<StandableObject*> platforms;
 
 	GameTime* gameTime;
 	ID3DXFont* font;

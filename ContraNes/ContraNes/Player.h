@@ -1,23 +1,7 @@
 #pragma once
-#include "GameplayObject.h"
+#include "Character.h"
 
-enum class Waterlogged {
-	YES,
-	NO
-};
-
-enum class JumpStatus {
-	JUMPING, 
-	IDLE 
-};
-
-enum class Facing {
-	LEFT,
-	RIGHT,
-	UP
-};
-
-class Player : public GameplayObject
+class Player : public Character
 {
 public:
 	Player(float x, float y);
@@ -27,12 +11,30 @@ public:
 	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0);
 	virtual void HandleInput(float gameTime) override;
 	virtual void Update(float gameTime) override;
-	void SetGravitationalAcceleration(float g);
-	void SetJumpVelocity(float j);
+
+	void SetPositionX(float x);
+
+	void SetPositionY(float y);
+
+	void SetPositionZ(float z);
+
+	D3DXVECTOR3 GetVelocity() const;
+
+	void SetVelocityX(float x);
+
+	void SetVelocityY(float y);
+
+	void SetVelocityZ(float z);
+
+	void SetGravitationalAcceleration(float gravitationalAcceleration);
+
+	void SetJumpVelocity(float jumpVelocity);
+
+	void SetJumpState(JumpStatus j);
+
+	JumpStatus GetJumpState() const;
+
 protected:
-	float gravitationalAcceleration;
-	float jumpVelocity;
-	JumpStatus jumpStatus;
 
 	float frameTime;
 	float frameDelay;
