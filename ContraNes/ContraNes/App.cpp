@@ -53,7 +53,11 @@ ID3DXSprite* pSprite;
 bool App::InitObjects()
 {
 	platforms.push_back(new StandableObject(-100,480,10000,1000, false));
-	platforms.push_back(new StandableObject(50, 200, 300, 50, true));
+	platforms.push_back(new StandableObject(50, 200, 1200, 50, true));
+	platforms.push_back(new StandableObject(500, 340, 60, 50, true));
+	platforms.push_back(new StandableObject(560, 400, 130, 50, true));
+	platforms.push_back(new StandableObject(690, 340, 60, 50, true));
+
 
 	background = new GameplayObject(0, 0, 1.0f, 0, 0, 0);
 	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
@@ -62,6 +66,8 @@ bool App::InitObjects()
 	player = new Player(100, 5, 0, (float)0, 300, 300);
 	if (!player->Init(m_pDevice3D, 0.15f)) return false;
 	player->SetJerkIncrementPerSecond3(19702.0f);
+	player->SetBaseJumpVelocity(500);
+	player->SetGravitationalAcceleration(1000);
 
 	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300);
 	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI)) return false;
@@ -124,12 +130,11 @@ void App::Update(float gameTime)
 	for (auto& platform : platforms)
 	{
 		RECT platformRect = platform->GetBounds();
-		OutputDebugString(ConvertToLPCWSTR(std::to_string(platformRect.left) + " " + std::to_string(platformRect.top) + " " + std::to_string(platformRect.right) + " " + std::to_string(platformRect.bottom) + "\n"));
-		OutputDebugString(ConvertToLPCWSTR("P: " + std::to_string(playerRect.left) + " " + std::to_string(playerRect.top) + " " + std::to_string(playerRect.right) + " " + std::to_string(playerRect.bottom) + "\n"));
+		//OutputDebugString(ConvertToLPCWSTR(std::to_string(platformRect.left) + " " + std::to_string(platformRect.top) + " " + std::to_string(platformRect.right) + " " + std::to_string(platformRect.bottom) + "\n"));
+		//OutputDebugString(ConvertToLPCWSTR("P: " + std::to_string(playerRect.left) + " " + std::to_string(playerRect.top) + " " + std::to_string(playerRect.right) + " " + std::to_string(playerRect.bottom) + "\n"));
 		// check collision
 		if ( CheckIntersection( &playerRect, &platformRect) )
 		{
-			OutputDebugStringW(L"alo");
 			platform->ApplyCollision(player, gameTime);
 		}
 	}
@@ -179,6 +184,7 @@ void App::Render(float gameTime)
 	}
 
 	if (font) {
+		message = ConvertToLPCWSTR(std::to_string(player->GetPosition().x) + " " + std::to_string(player->GetPosition().y) + "\n" + std::to_string(player->GetPosition().x + player->GetSprite()->spriteWidth) + " " + std::to_string(player->GetPosition().y + player->GetSprite()->spriteHeight));
 		font->DrawTextW(NULL, message, -1, &messageRect, DT_LEFT, D3DCOLOR_ARGB(255, 255, 255, 0));
 	}
 

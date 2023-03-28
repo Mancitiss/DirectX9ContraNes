@@ -9,10 +9,10 @@ StandableObject::StandableObject(float x, float y, float width, float height, bo
 	this->platformWidth = width;
 	this->platformHeight = height;
 	bounds = RECT();
-	bounds.left = x;
-	bounds.top = y;
-	bounds.right = x + width;
-	bounds.bottom = y + height;
+	bounds.left = (LONG)x;
+	bounds.top = (LONG)y;
+	bounds.right = (LONG)(x + width);
+	bounds.bottom = (LONG)(y + height);
 }
 
 StandableObject::~StandableObject()
@@ -36,42 +36,50 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 	float changedX = object->GetVelocity().x * gameTime;
 	float changedY = object->GetVelocity().y * gameTime;
 
-	if (object->GetJumpState() == JumpStatus::JUMPING && object->GetPosition().x + object->GetSprite()->spriteWidth - changedX > platformPosition.x - forgivingWidth
+	/*if (object->GetPosition().x + object->GetSprite()->spriteWidth - changedX > platformPosition.x - forgivingWidth
 		|| object->GetPosition().x - changedX < platformPosition.x + platformWidth + forgivingWidth)
-	{
+	{*/
 		if (object->GetPosition().y + object->GetSprite()->spriteHeight - changedY <= platformPosition.y)
 		{
 			// the object is above the platform
 			// the object will be standing on the platform
-			object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight );
+			object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight + 1 );
 			object->SetVelocityY(0);
 			object->SetJumpVelocity(0);
-			object->SetJumpState(JumpStatus::IDLE);
-		}
-		else if (object->GetPosition().y + object->GetSprite()->spriteHeight - changedY > platformPosition.y && object->GetPosition().y > platformPosition.y - platformHeight)
-		{
-			// the object is below the platform
-			// the object will be falling through the platform
-			if (!jumpThrough && object->GetVelocity().y < 0)
-			{
-				object->SetPositionY(platformPosition.y + platformHeight); 
-				object->SetVelocityY(0);
-				object->SetJumpVelocity(0);
-			}
-			else if (!fallThrough && object->GetVelocity().y > 0)
-			{
-				object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight);
-			}
-		}
-	}
-	else {
-		if (object->GetPosition().x - changedX > platformPosition.x + platformWidth + forgivingWidth)
-		{
-			object->SetPositionX(platformPosition.x + platformWidth);
+			object->ResetJumpCount();
+			//object->SetJumpState(JumpStatus::IDLE);
 		}
 		else
 		{
-			object->SetPositionX(platformPosition.x - object->GetSprite()->spriteWidth);
+			if (object->GetVelocity().y <= 0) {
+				if (!jumpThrough) {
+					object->SetPositionY(platformPosition.y + platformHeight);
+					object->SetVelocityY(0);
+					object->SetJumpVelocity(0);
+				}
+			}
+			else {
+				if (fallThrough && object->GetJumpCount() < object->GetMaxJumpCount() /*object->GetMovementVector().y > 0*/) {
+					//return;
+				}
+				else {
+					object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight + 1);
+					object->SetVelocityY(0);
+					object->SetJumpVelocity(0);
+					object->ResetJumpCount();
+				}
+			}
 		}
-	}
+	/*}
+	else {*/
+		//OutputDebugString(L"alo");
+		if (object->GetPosition().x - changedX > platformPosition.x + platformWidth)
+		{
+			object->SetPositionX(platformPosition.x + platformWidth + 10);
+		}
+		else if (object->GetPosition().x - changedX < platformPosition.x)
+		{
+			object->SetPositionX(platformPosition.x - object->GetSprite()->spriteWidth*1.1 - 10);
+		}
+	//}
 }

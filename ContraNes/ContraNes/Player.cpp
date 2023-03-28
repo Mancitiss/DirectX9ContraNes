@@ -8,27 +8,30 @@ Player::Player(float x, float y) : Character(x, y, 0, 0, 0, 300.0f)
 {
 	gravitationalAcceleration = 2000;
 	jumpVelocity = 0;
-	jumpStatus = JumpStatus::JUMPING;
 	facing = Facing::RIGHT;
 	lockYFacing = true;
+	maxJump = 1;
+	jumpCount = 0;
 }
 
 Player::Player(float x, float y, float rotation, float speed, float maxSpeed) : Character(x, y, rotation, speed, maxSpeed)
 {
 	gravitationalAcceleration = 2000;
 	jumpVelocity = 0;
-	jumpStatus = JumpStatus::JUMPING;
 	facing = Facing::RIGHT;
 	lockYFacing = true;
+	maxJump = 1;
+	jumpCount = 0;
 }
 
 Player::Player(float x, float y, float z, float rotation, float speed, float maxSpeed) : Character(x, y, z, rotation, speed, maxSpeed)
 {
 	gravitationalAcceleration = 2000;
 	jumpVelocity = 0;
-	jumpStatus = JumpStatus::JUMPING;
 	facing = Facing::RIGHT;
 	lockYFacing = true;
+	maxJump = 1;
+	jumpCount = 0;
 }
 
 Player::~Player()
@@ -225,25 +228,27 @@ void Player::HandleInput(float gameTime)
 	// if the down arrow and space are pressed at the same time, move the sprite down
 	if (GetAsyncKeyState(Keyboard::DOWN) && GetAsyncKeyState(Keyboard::JUMP))
 	{
-		if (jumpStatus == JumpStatus::IDLE)
+		if (!hasJumped && jumpCount > 0)
 		{
-			jumpStatus = JumpStatus::JUMPING;
+			jumpCount -= 1;
 			jumpVelocity = 0;
 		}
 		movementVector.y += 1;
 	}
 
-	// if the up arrow is pressed, move the sprite up
-	if (GetAsyncKeyState(Keyboard::JUMP))
+	if (SHORT s = GetAsyncKeyState(Keyboard::JUMP))
 	{
-		if (jumpStatus == JumpStatus::IDLE)
+		if (!hasJumped && jumpCount > 0 && ((s & 0x8001) == 0x8001))
 		{
-			jumpStatus = JumpStatus::JUMPING;
-			jumpVelocity = 1000;
+			hasJumped = true;
+			jumpCount -= 1;
+			jumpVelocity = baseJumpVelocity;
 		}
 		movementVector.y -= 1;
 	}
+	else hasJumped = false;
 
+	// if the up arrow is pressed, move the sprite up
 	if (GetAsyncKeyState(Keyboard::UP)) {
 		directionVector.y -= 1;
 	}
@@ -271,6 +276,8 @@ void Player::HandleInput(float gameTime)
 	{
 	}
 
+	this->movementVector = movementVector;
+
 	/*if (movementVector.x != 0 || movementVector.y != 0)
 	{
 		rotation = atan2(movementVector.y, movementVector.x);
@@ -279,11 +286,11 @@ void Player::HandleInput(float gameTime)
 	currentAcceleration = min(currentAcceleration + currentJerk * gameTime, maxSpeed / gameTime);
 	currentVelocity = min(currentVelocity + currentAcceleration * gameTime, maxSpeed);
 	velocity.x = movementVector.x * currentVelocity;
-	if (jumpStatus == JumpStatus::JUMPING) {
+	//if (jumpCount < maxJump) {
 		if (movementVector.y >= 0 && jumpVelocity > 0) jumpVelocity = - gravitationalAcceleration * gameTime;
 		velocity.y = - jumpVelocity;
 		jumpVelocity -= gravitationalAcceleration * gameTime;
-	}
+	//}
 	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gravitationalAcceleration) + " " + std::to_string(gameTime) + " " + std::to_string(jumpVelocity) + ", " + std::to_string(velocity.y) + ", " + std::to_string(0 + (jumpStatus == JumpStatus::JUMPING)) + "\n"));
 
 	this->prev = this->sprite;
@@ -352,7 +359,7 @@ void Player::HandleInput(float gameTime)
 				else this->sprite = this->pIdleUp;
 			}
 		}
-		OutputDebugString(ConvertToLPCWSTR(std::to_string(directionVector.x) + " " + std::to_string(directionVector.y) + "\n"));
+		//OutputDebugString(ConvertToLPCWSTR(std::to_string(directionVector.x) + " " + std::to_string(directionVector.y) + "\n"));
 
 		this->currentDirection = directionVector;
 	}
@@ -408,6 +415,16 @@ D3DXVECTOR3 Player::GetVelocity() const
 	return velocity;
 }
 
+D3DXVECTOR3 Player::GetDirection() const
+{
+	return this->currentDirection;
+}
+
+D3DXVECTOR3 Player::GetMovementVector() const
+{
+	return this->movementVector;
+}
+
 void Player::SetVelocityX(float x)
 {
 	this->velocity.x = x;
@@ -433,12 +450,22 @@ void Player::SetJumpVelocity(float jumpVelocity)
 	this->jumpVelocity = jumpVelocity;
 }
 
-void Player::SetJumpState(JumpStatus j)
+void Player::ResetJumpCount()
 {
-	this->jumpStatus = j;
+	this->jumpCount = maxJump;
 }
 
-JumpStatus Player::GetJumpState() const
+int Player::GetJumpCount() const
 {
-	return jumpStatus;
+	return jumpCount;
+}
+
+int Player::GetMaxJumpCount() const
+{
+	return maxJump;
+}
+
+void Player::SetBaseJumpVelocity(float baseJumpVelocity)
+{
+	this->baseJumpVelocity = baseJumpVelocity;
 }

@@ -6,11 +6,6 @@ enum class Waterlogged {
 	NO
 };
 
-enum class JumpStatus {
-	JUMPING,
-	IDLE
-};
-
 enum class Facing {
 	LEFT,
 	RIGHT,
@@ -25,6 +20,8 @@ public:
 	Character(float x, float y, float z, float rotation, float speed, float maxSpeed) : GameplayObject(x, y, z, rotation, speed, maxSpeed) {};
 	virtual ~Character() {};
 	virtual D3DXVECTOR3 GetVelocity() const = 0;
+	virtual D3DXVECTOR3 GetDirection() const = 0;
+	virtual D3DXVECTOR3 GetMovementVector() const = 0;
 	virtual void SetVelocityX(float x) = 0;
 	virtual void SetVelocityY(float y) = 0;
 	virtual void SetVelocityZ(float z) = 0;
@@ -35,12 +32,18 @@ public:
 	virtual void SetGravitationalAcceleration(float g) = 0;
 	virtual void SetJumpVelocity(float j) = 0;
 
-	virtual JumpStatus GetJumpState() const = 0;
-	virtual void SetJumpState(JumpStatus jumpStatus) = 0;
+	virtual void ResetJumpCount() = 0;
+
+	virtual int GetJumpCount() const = 0;
+	virtual int GetMaxJumpCount() const = 0;
+
+	virtual void SetBaseJumpVelocity(float bj) = 0;
 
 protected:
-	JumpStatus jumpStatus;
+	int jumpCount;
+	int maxJump;
 
 	float gravitationalAcceleration;
 	float jumpVelocity;
+	float baseJumpVelocity;
 };

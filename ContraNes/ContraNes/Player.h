@@ -5,34 +5,48 @@ class Player : public Character
 {
 public:
 	Player(float x, float y);
+
 	Player(float x, float y, float rotation, float speed, float maxSpeed);
+
 	Player(float x, float y, float z, float rotation, float speed, float maxSpeed);
+
 	~Player();
+
 	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0);
+
 	virtual void HandleInput(float gameTime) override;
+
 	virtual void Update(float gameTime) override;
 
-	void SetPositionX(float x);
+	virtual D3DXVECTOR3 GetVelocity() const override;
 
-	void SetPositionY(float y);
+	virtual D3DXVECTOR3 GetDirection() const override;
 
-	void SetPositionZ(float z);
+	virtual D3DXVECTOR3 GetMovementVector() const override;
 
-	D3DXVECTOR3 GetVelocity() const;
+	virtual void SetPositionX(float x) override;
 
-	void SetVelocityX(float x);
+	virtual void SetPositionY(float y) override;
 
-	void SetVelocityY(float y);
+	virtual void SetPositionZ(float z) override;
 
-	void SetVelocityZ(float z);
+	virtual void SetVelocityX(float x) override;
 
-	void SetGravitationalAcceleration(float gravitationalAcceleration);
+	virtual void SetVelocityY(float y) override;
 
-	void SetJumpVelocity(float jumpVelocity);
+	virtual void SetVelocityZ(float z) override;
 
-	void SetJumpState(JumpStatus j);
+	virtual void SetGravitationalAcceleration(float gravitationalAcceleration) override;
 
-	JumpStatus GetJumpState() const;
+	virtual void SetJumpVelocity(float jumpVelocity) override;
+
+	virtual void ResetJumpCount() override;
+
+	virtual int GetJumpCount() const override;
+
+	virtual int GetMaxJumpCount() const override;
+
+	virtual void SetBaseJumpVelocity(float bj) override;
 
 protected:
 
@@ -41,6 +55,7 @@ protected:
 
 	Waterlogged waterlogged;
 	bool lockXFacing, lockYFacing;
+	D3DXVECTOR3 movementVector;
 	D3DXVECTOR3 currentDirection;
 	Facing facing;
 
@@ -70,4 +85,7 @@ protected:
 	GameSprite* pShootWL;
 	GameSprite* pShootR;
 	GameSprite* pShootL;*/
+
+private:
+	bool hasJumped = true;
 };
