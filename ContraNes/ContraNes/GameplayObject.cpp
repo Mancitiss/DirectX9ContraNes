@@ -3,7 +3,7 @@
 #include "GameplayObject.h"
 
 
-GameplayObject::GameplayObject(float x, float y, float rotation, float speed, float maxSpeed)
+GameplayObject::GameplayObject(float x, float y, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale)
 {
 	float two_pi = (float)(M_PI * 2.0f);
 	this->position = D3DXVECTOR3(x, y, 0);
@@ -24,9 +24,11 @@ GameplayObject::GameplayObject(float x, float y, float rotation, float speed, fl
 
 	currentAcceleration = 0;
 	currentJerk = 0;
+
+	this->internalScale = internalScale;
 }
 
-GameplayObject::GameplayObject(float x, float y, float z, float rotation, float speed, float maxSpeed)
+GameplayObject::GameplayObject(float x, float y, float z, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale)
 {
 	// NOTE: because the y axis is inverted, the PI circle is actually go clockwise instead of counter clockwise
 	float two_pi = (float)(M_PI * 2.0f);
@@ -48,6 +50,8 @@ GameplayObject::GameplayObject(float x, float y, float z, float rotation, float 
 
 	currentAcceleration = 0;
 	currentJerk = 0;
+
+	this->internalScale = internalScale;
 }
 
 GameplayObject::~GameplayObject()
@@ -64,7 +68,7 @@ bool GameplayObject::Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int
 	status = ObjectStatus::ACTIVE;
 	if (!sprite) {
 		sprite = new GameSprite();
-		if (!sprite->Init(device, file, width, height, baseZRotation))
+		if (!sprite->Init(device, file, width, height, baseZRotation, internalScale))
 		{
 			return false;
 		}
@@ -96,11 +100,11 @@ void GameplayObject::Draw(float dt)
 	}
 }
 
-void GameplayObject::Draw(D3DXVECTOR3* position, float dt)
+void GameplayObject::Draw(D3DXVECTOR3* position, D3DXVECTOR3* scaleFactors, float dt)
 {
 	if (sprite) {
-
-		sprite->Draw(position, rotation);
+		//D3DXVECTOR3 scale = D3DXVECTOR3(internalScale.x * scaleFactors->x, internalScale.y * scaleFactors->y, internalScale.z * scaleFactors->z);
+		sprite->Draw(position, scaleFactors, rotation);
 	}
 }
 

@@ -20,9 +20,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 ContraApp::ContraApp(HINSTANCE hInstance) 
 {
 	m_hAppInstance = hInstance;
-	m_hAppWnd = NULL;
-	m_uiClientWidth = 700;
-	m_uiClientHeight = 700;
+	m_hAppWnd = NULL; 
+	/*m_uiClientWidth = 1400;
+	m_uiClientHeight = 960;*/
+	m_uiClientWidth = 1024;
+	m_uiClientHeight = 960;
 	/*m_uiClientWidth = 1280;
 	m_uiClientWidth = 960;*/
 	m_strAppTitle = "ContraNes";

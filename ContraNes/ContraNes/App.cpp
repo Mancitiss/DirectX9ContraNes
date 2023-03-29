@@ -52,24 +52,28 @@ ID3DXSprite* pSprite;
 
 bool App::InitObjects()
 {
-	platforms.push_back(new StandableObject(-100,480,10000,1000, false));
-	platforms.push_back(new StandableObject(50, 200, 1200, 50, true));
+	platforms.push_back(new StandableObject(-100,480,10000,1000, false)); // 0
+	platforms.push_back(new StandableObject(50, 200, 1450, 50, true)); // 1
+	platforms.push_back(new StandableObject(300, 270, 200, 50, true));
 	platforms.push_back(new StandableObject(500, 340, 60, 50, true));
 	platforms.push_back(new StandableObject(560, 400, 130, 50, true));
-	platforms.push_back(new StandableObject(690, 340, 60, 50, true));
+	platforms.push_back(new StandableObject(690, 340, 60, 50, true)); // 5
+	platforms.push_back(new StandableObject(800, 270, 140, 50, true));
+	platforms.push_back(new StandableObject(1190, 400, 140, 50, true));
+	platforms.push_back(new StandableObject(1250, 300, 190, 50, true));
 
 
 	background = new GameplayObject(0, 0, 1.0f, 0, 0, 0);
 	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
 	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth * 1.0f, background->GetSprite()->spriteHeight * 1.0f);
 
-	player = new Player(100, 5, 0, (float)0, 300, 300);
+	player = new Player(100, 5, 0, (float)0, 300, 300, D3DXVECTOR3(2, 2, 1));
 	if (!player->Init(m_pDevice3D, 0.15f)) return false;
 	player->SetJerkIncrementPerSecond3(19702.0f);
-	player->SetBaseJumpVelocity(500);
+	player->SetBaseJumpVelocity(400);
 	player->SetGravitationalAcceleration(1000);
 
-	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300);
+	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300, D3DXVECTOR3(2, 2, 1));
 	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI)) return false;
 	return true;
 }
@@ -81,7 +85,7 @@ bool App::Init()
 	if (!ContraApp::Init())
 		return false;
 
-	camera = new Camera(0, 0, 0, width, height, 0, DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
+	camera = new Camera(0, 0, 0, width, height, 0, D3DXVECTOR3(2.0f, 2.0f, 1.0f));
 
 
 	// initialize game objects / check game object creation

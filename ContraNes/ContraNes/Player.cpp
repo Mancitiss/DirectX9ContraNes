@@ -4,7 +4,7 @@
 #include "GameSprite.h"
 #include "d3dUtil.h"
 
-Player::Player(float x, float y) : Character(x, y, 0, 0, 0, 300.0f)
+Player::Player(float x, float y, D3DXVECTOR3 internalScale) : Character(x, y, 0, 0, 0, 300.0f, internalScale)
 {
 	gravitationalAcceleration = 2000;
 	jumpVelocity = 0;
@@ -14,7 +14,7 @@ Player::Player(float x, float y) : Character(x, y, 0, 0, 0, 300.0f)
 	jumpCount = 0;
 }
 
-Player::Player(float x, float y, float rotation, float speed, float maxSpeed) : Character(x, y, rotation, speed, maxSpeed)
+Player::Player(float x, float y, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale) : Character(x, y, rotation, speed, maxSpeed, internalScale)
 {
 	gravitationalAcceleration = 2000;
 	jumpVelocity = 0;
@@ -24,7 +24,7 @@ Player::Player(float x, float y, float rotation, float speed, float maxSpeed) : 
 	jumpCount = 0;
 }
 
-Player::Player(float x, float y, float z, float rotation, float speed, float maxSpeed) : Character(x, y, z, rotation, speed, maxSpeed)
+Player::Player(float x, float y, float z, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale) : Character(x, y, z, rotation, speed, maxSpeed, internalScale)
 {
 	gravitationalAcceleration = 2000;
 	jumpVelocity = 0;
@@ -57,14 +57,14 @@ Player::~Player()
 	this->sprite = nullptr;
 }
 
-bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
+bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay, D3DXVECTOR3 internalScale)
 {
 	status = ObjectStatus::ACTIVE;
 
 	if (!this->pIdleRight) 
 	{
 		this->pIdleRight = new GameSprite();
-		if (!this->pIdleRight->Init(device, L"resources/player/R.png", 24, 34, 0))
+		if (!this->pIdleRight->Init(device, L"resources/player/R.png", 24, 34, 0, internalScale))
 		{
 			return false;
 		}
@@ -75,7 +75,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 	if (!this->pIdleLeft)
 	{
 		this->pIdleLeft = new GameSprite();
-		if (!this->pIdleLeft->Init(device, L"resources/player/L.png", 24, 34, 0))
+		if (!this->pIdleLeft->Init(device, L"resources/player/L.png", 24, 34, 0, internalScale))
 		{
 			return false;
 		}
@@ -86,7 +86,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 	if (!this->pIdleUpLeft) 
 	{
 		this->pIdleUpLeft = new GameSprite();
-		if (!this->pIdleUpLeft->Init(device, L"resources/player/W-L.png", 14, 46, 0))
+		if (!this->pIdleUpLeft->Init(device, L"resources/player/W-L.png", 14, 46, 0, internalScale))
 		{
 			return false;
 		}
@@ -97,7 +97,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 	if (!this->pIdleUpRight)
 	{
 		this->pIdleUpRight = new GameSprite();
-		if (!this->pIdleUpRight->Init(device, L"resources/player/W-R.png", 14, 46, 0))
+		if (!this->pIdleUpRight->Init(device, L"resources/player/W-R.png", 14, 46, 0, internalScale))
 		{
 			return false;
 		}
@@ -108,7 +108,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 	if (!this->pIdleDownLeft)
 	{
 		this->pIdleDownLeft = new GameSprite();
-		if (!this->pIdleDownLeft->Init(device, L"resources/player/S-L.png", 34, 17, 0))
+		if (!this->pIdleDownLeft->Init(device, L"resources/player/S-L.png", 34, 17, 0, internalScale))
 		{
 			return false;
 		}
@@ -119,7 +119,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 	if (!this->pIdleDownRight)
 	{
 		this->pIdleDownRight = new GameSprite();
-		if (!this->pIdleDownRight->Init(device, L"resources/player/S-R.png", 34, 17, 0))
+		if (!this->pIdleDownRight->Init(device, L"resources/player/S-R.png", 34, 17, 0, internalScale))
 		{
 			return false;
 		}
@@ -130,7 +130,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 	if (!this->pIdleUp)
 	{
 		this->pIdleUp = new GameSprite();
-		if (!this->pIdleUp->Init(device, L"resources/player/40.png", 19, 45, 0))
+		if (!this->pIdleUp->Init(device, L"resources/player/40.png", 19, 45, 0, internalScale))
 		{
 			return false;
 		}
@@ -140,7 +140,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 	if (!this->pMoveRight)
 	{
-		if (!CreateSprites(device, 5, "resources/player/R", ".png", this->pMoveRight, this->pIdleRight))
+		if (!CreateSprites(device, 5, "resources/player/R", ".png", this->pMoveRight, this->pIdleRight, internalScale))
 		{
 			return false;
 		}
@@ -148,7 +148,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 	if (!this->pMoveLeft)
 	{
-		if (!CreateSprites(device, 5, "resources/player/L", ".png", this->pMoveLeft, this->pIdleLeft))
+		if (!CreateSprites(device, 5, "resources/player/L", ".png", this->pMoveLeft, this->pIdleLeft, internalScale))
 		{
 			return false;
 		}
@@ -156,7 +156,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 	if (!this->pMoveUp)
 	{
-		if (!CreateSprites(device, 2, "resources/player/W", ".png", this->pMoveUp, this->pIdleUp))
+		if (!CreateSprites(device, 2, "resources/player/W", ".png", this->pMoveUp, this->pIdleUp, internalScale))
 		{
 			return false;
 		
@@ -165,7 +165,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 	if (!this->pJumpRight)
 	{
-		if (!CreateSprites(device, 4, "resources/player/JR", ".png", this->pJumpRight, this->pIdleRight))
+		if (!CreateSprites(device, 4, "resources/player/JR", ".png", this->pJumpRight, this->pIdleRight, internalScale))
 		{
 			return false;
 		}
@@ -173,7 +173,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 	if (!this->pJumpLeft)
 	{
-		if (!CreateSprites(device, 4, "resources/player/JL", ".png", this->pJumpLeft, this->pIdleLeft))
+		if (!CreateSprites(device, 4, "resources/player/JL", ".png", this->pJumpLeft, this->pIdleLeft, internalScale))
 		{
 			return false;
 		}
@@ -181,7 +181,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 	if (!this->pMoveRightUp)
 	{
-		if (!CreateSprites(device, 3, "resources/player/WR", ".png", this->pMoveRightUp, this->pIdleRight))
+		if (!CreateSprites(device, 3, "resources/player/WR", ".png", this->pMoveRightUp, this->pIdleRight, internalScale))
 		{
 			return false;
 		}
@@ -189,7 +189,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 	if (!this->pMoveLeftUp)
 	{
-		if (!CreateSprites(device, 3, "resources/player/WL", ".png", this->pMoveLeftUp, this->pIdleLeft))
+		if (!CreateSprites(device, 3, "resources/player/WL", ".png", this->pMoveLeftUp, this->pIdleLeft, internalScale))
 		{
 			return false;
 		}
@@ -197,7 +197,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 	if (!this->pMoveRightDown)
 	{
-		if (!CreateSprites(device, 3, "resources/player/SR", ".png", this->pMoveRightDown, this->pIdleRight))
+		if (!CreateSprites(device, 3, "resources/player/SR", ".png", this->pMoveRightDown, this->pIdleRight, internalScale))
 		{
 			return false;
 		}
@@ -205,7 +205,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 	if (!this->pMoveLeftDown)
 	{
-		if (!CreateSprites(device, 3, "resources/player/SL", ".png", this->pMoveLeftDown, this->pIdleLeft))
+		if (!CreateSprites(device, 3, "resources/player/SL", ".png", this->pMoveLeftDown, this->pIdleLeft, internalScale))
 		{
 			return false;
 		}
@@ -232,6 +232,7 @@ void Player::HandleInput(float gameTime)
 		{
 			jumpCount -= 1;
 			jumpVelocity = 0;
+			this->jumpDown = true;
 		}
 		movementVector.y += 1;
 	}
@@ -468,4 +469,14 @@ int Player::GetMaxJumpCount() const
 void Player::SetBaseJumpVelocity(float baseJumpVelocity)
 {
 	this->baseJumpVelocity = baseJumpVelocity;
+}
+
+void Player::SetJumpDown(bool b)
+{
+	this->jumpDown = b;
+}
+
+bool Player::GetJumpDown() const
+{
+	return this->jumpDown;
 }

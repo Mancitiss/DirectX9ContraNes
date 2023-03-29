@@ -9,8 +9,8 @@ enum class ObjectStatus {ACTIVE, DYING, DEAD};
 class GameplayObject
 {
 public:
-	GameplayObject(float x, float y, float rotation, float speed, float maxSpeed);
-	GameplayObject(float x, float y, float z, float rotation, float speed, float maxSpeed);
+	GameplayObject(float x, float y, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1));
+	GameplayObject(float x, float y, float z, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1));
 
 	~GameplayObject();
 
@@ -18,7 +18,7 @@ public:
 	virtual bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR file, int width, int height, float baseZRotation = 0, D3DCOLOR backColor = D3DCOLOR_ARGB(0, 0, 0, 0), D3DCOLOR displayColor = D3DCOLOR_ARGB(255, 255, 255, 255));
 	virtual void Update(float dt);
 	virtual void Draw(float dt);
-	virtual void Draw(D3DXVECTOR3* position, float dt);
+	virtual void Draw(D3DXVECTOR3* position, D3DXVECTOR3* scaleFactors, float dt);
 
 	ObjectStatus GetStatus() const;
 	GameSprite* GetSprite() const;
@@ -32,6 +32,8 @@ public:
 protected:
 	LPCTSTR Name;
 	LPCTSTR Description;
+
+	D3DXVECTOR3 internalScale;
 
 	// position
 	D3DXVECTOR3 position;

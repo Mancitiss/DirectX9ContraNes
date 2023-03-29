@@ -2,7 +2,7 @@
 #include "ContraApp.h"
 #include "d3dUtil.h"
 
-Camera::Camera(int x, int y, int z, int width, int height, float angle, DirectX::XMFLOAT3 scaleFactors)
+Camera::Camera(float x, float y, float z, int width, int height, float angle, D3DXVECTOR3 scaleFactors)
 {
 	this->width = width;
 	this->height = height;
@@ -32,15 +32,15 @@ void Camera::SetLimit(float x, float y, float width, float height)
 	limits->right = x + width;
 	limits->bottom = y + height;
 
-	if (width <= this->width) {
+	if (width * scaleFactors.x <= this->width) {
 		this->lockX = true;
-		this->position.x = x + width / 2 - this->width / 2;
+		this->position.x = x + width / 2 - this->width / (2 * scaleFactors.x);
 	}
 	else this->lockX = false;
 
-	if (height <= this->height) {
+	if (height * scaleFactors.y <= this->height) {
 		this->lockY = true;
-		this->position.y = y + height / 2 - this->height / 2;
+		this->position.y = y + height / 2 - this->height / (2 * scaleFactors.y);
 	}
 	else this->lockY = false;
 }
@@ -49,32 +49,32 @@ void Camera::Update(float dt)
 {
 	if (this->following && this->following->IsInitialized()) {
 		if (!this->lockX) {
-			float x = this->following->GetPosition().x - width / 2; 
+			float x = this->following->GetPosition().x - width / (2 * scaleFactors.x); 
 			if (limits != nullptr)
 			{
 				if (x < limits->left)
 				{
 					x = limits->left;
 				}
-				else if (x + width > limits->right)
+				else if (x + width / scaleFactors.x > limits->right)
 				{
-					x = limits->right - width;
+					x = limits->right - width / scaleFactors.x;
 				}
 			}
 			this->position.x = x;
 		}
 
 		if (!this->lockY) {
-			float y = this->following->GetPosition().y - height / 2;
+			float y = this->following->GetPosition().y - height / (2 * scaleFactors.y);
 			if (limits != nullptr)
 			{
 				if (y < limits->top)
 				{
 					y = limits->top;
 				}
-				else if (y + height > limits->bottom)
+				else if (y + height / scaleFactors.y > limits->bottom)
 				{
-					y = limits->bottom - height;
+					y = limits->bottom - height / scaleFactors.y;
 				}
 			}
 			this->position.y = y;
@@ -103,7 +103,7 @@ void Camera::Render(GameplayObject* object, float gameTime)
 {
 	if (object->IsInitialized()) {
 		D3DXVECTOR3 relativePosition = object->GetPosition() - this->position;
-		object->Draw(&relativePosition, gameTime);
+		object->Draw(&relativePosition, &this->scaleFactors , gameTime);
 	}
 }
 

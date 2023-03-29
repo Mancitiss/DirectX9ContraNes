@@ -25,7 +25,7 @@ void GetPngImageDimensions(std::string& file_path, unsigned int& width, unsigned
 	height = (buf[4] << 24) + (buf[5] << 16) + (buf[6] << 8) + (buf[7] << 0);
 }
 
-bool CreateSprites(LPDIRECT3DDEVICE9 device, int N, const std::string& prefix, const std::string& ext, GameSprite*& first, GameSprite*& pDefault)
+bool CreateSprites(LPDIRECT3DDEVICE9 device, int N, const std::string& prefix, const std::string& ext, GameSprite*& first, GameSprite*& pDefault, D3DXVECTOR3& internalScale)
 {
     std::string filename;
     GameSprite* current = nullptr;
@@ -42,7 +42,7 @@ bool CreateSprites(LPDIRECT3DDEVICE9 device, int N, const std::string& prefix, c
 
         // Create a new GameSprite with the image dimensions
         GameSprite* sprite = new GameSprite();
-        if (!sprite->Init(device, ConvertToLPCWSTR(filename), width, height, 0))
+        if (!sprite->Init(device, ConvertToLPCWSTR(filename), width, height, 0, internalScale))
         {
             // Cleanup and return false if sprite creation fails
             delete sprite;

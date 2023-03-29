@@ -15,9 +15,9 @@ enum class Facing {
 class Character : public GameplayObject
 {
 public:
-	Character(float x, float y) : GameplayObject(x, y, 0, 0, 0, 300.0f) {};
-	Character(float x, float y, float rotation, float speed, float maxSpeed) : GameplayObject(x, y, rotation, speed, maxSpeed) {};
-	Character(float x, float y, float z, float rotation, float speed, float maxSpeed) : GameplayObject(x, y, z, rotation, speed, maxSpeed) {};
+	Character(float x, float y, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1)) : GameplayObject(x, y, 0, 0, 0, 300.0f, internalScale) {};
+	Character(float x, float y, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1)) : GameplayObject(x, y, rotation, speed, maxSpeed, internalScale) {};
+	Character(float x, float y, float z, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1)) : GameplayObject(x, y, z, rotation, speed, maxSpeed, internalScale) {};
 	virtual ~Character() {};
 	virtual D3DXVECTOR3 GetVelocity() const = 0;
 	virtual D3DXVECTOR3 GetDirection() const = 0;
@@ -39,9 +39,12 @@ public:
 
 	virtual void SetBaseJumpVelocity(float bj) = 0;
 
+	virtual void SetJumpDown(bool b) = 0;
+	virtual bool GetJumpDown() const = 0;
 protected:
 	int jumpCount;
 	int maxJump;
+	bool jumpDown; // indicate if the jump down action is being performed (not up)
 
 	float gravitationalAcceleration;
 	float jumpVelocity;

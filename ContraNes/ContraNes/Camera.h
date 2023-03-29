@@ -6,7 +6,7 @@
 class Camera 
 {
 public:
-	Camera(int x, int y, int z, int width, int height, float angle , DirectX::XMFLOAT3 scaleFactors);
+	Camera(float x, float y, float z, int width, int height, float angle , D3DXVECTOR3 scaleFactors);
 	~Camera();
 
 	void Update(float dt);
@@ -24,7 +24,7 @@ private:
 	int width;
 	int height;
 	D3DXVECTOR3 position;
-	DirectX::XMFLOAT3 scaleFactors;
+	D3DXVECTOR3 scaleFactors;
 	GameplayObject* following;
 	RECT* limits;
 	bool lockX, lockY;

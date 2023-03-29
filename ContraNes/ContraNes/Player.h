@@ -4,15 +4,15 @@
 class Player : public Character
 {
 public:
-	Player(float x, float y);
+	Player(float x, float y, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1));
 
-	Player(float x, float y, float rotation, float speed, float maxSpeed);
+	Player(float x, float y, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1));
 
-	Player(float x, float y, float z, float rotation, float speed, float maxSpeed);
+	Player(float x, float y, float z, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1));
 
 	~Player();
 
-	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0);
+	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1));
 
 	virtual void HandleInput(float gameTime) override;
 
@@ -47,6 +47,10 @@ public:
 	virtual int GetMaxJumpCount() const override;
 
 	virtual void SetBaseJumpVelocity(float bj) override;
+
+	virtual void SetJumpDown(bool b) override;
+
+	virtual bool GetJumpDown() const override;
 
 protected:
 

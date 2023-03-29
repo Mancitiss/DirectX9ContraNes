@@ -13,10 +13,10 @@ public:
 	~GameSprite();
 
 	// methods
-	bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height, float baseZRotation = 0, D3DCOLOR backColor = D3DCOLOR_ARGB(0, 0, 0, 0), D3DCOLOR displayColor = D3DCOLOR_ARGB(255, 255, 255, 255));
+	bool Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height, float baseZRotation = 0, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1), D3DCOLOR backColor = D3DCOLOR_ARGB(0, 0, 0, 0), D3DCOLOR displayColor = D3DCOLOR_ARGB(255, 255, 255, 255));
 	bool IsInitialized();
 	void Draw(D3DXVECTOR3 *position);
-	void Draw(D3DXVECTOR3 *position, float rotation);
+	void Draw(D3DXVECTOR3 *position, D3DXVECTOR3* scaleFactors, float rotation);
 	LPDIRECT3DTEXTURE9 GetTexture() const;
 	D3DXVECTOR3 GetPosition() const;
 	void SetDisplayColor(D3DCOLOR color);

@@ -30,7 +30,7 @@ GameSprite::~GameSprite()
 
 }
 
-bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height, float baseZRotation, D3DCOLOR backColor, D3DCOLOR displayColor)
+bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int height, float baseZRotation, D3DXVECTOR3 internalScale, D3DCOLOR backColor, D3DCOLOR displayColor)
 {
 	// same functionality as D3DXCreateTextureFromFile EXCEPT it allows you to specify the width and height
 	// this is useful for sprites that are not a power of 2
@@ -43,7 +43,7 @@ bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int heig
 		return false;
 	}*/
 
-	HRESULT hr = D3DXCreateTextureFromFileEx(device, rss, width, height,
+	HRESULT hr = D3DXCreateTextureFromFileEx(device, rss, width*internalScale.x, height*internalScale.y,
 		1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, backColor,
 		NULL, NULL, &tex);
 	if (FAILED(hr))
@@ -103,7 +103,7 @@ void GameSprite::Draw(D3DXVECTOR3* position)
 	}
 }
 
-void GameSprite::Draw(D3DXVECTOR3* position, float rotation)
+void GameSprite::Draw(D3DXVECTOR3* position, D3DXVECTOR3* scaleFactors, float rotation)
 {
 	if (sprite && tex)
 	{
@@ -114,7 +114,15 @@ void GameSprite::Draw(D3DXVECTOR3* position, float rotation)
 		// make quat
 		D3DXQuaternionRotationYawPitchRoll(&quat, 0, 0, baseZRotation + rotation);
 		D3DXMatrixAffineTransformation(&mat, 1.0f, &position2, &quat, NULL);
+
+		// scale matrix
+		D3DXMATRIX mat2;
+		D3DXMatrixScaling(&mat2, scaleFactors->x, scaleFactors-> y, scaleFactors->z);
+
+		// combine the matrices
+		mat = mat * mat2;
 		
+
 		// set the rotation
 		sprite->SetTransform(&mat);
 
