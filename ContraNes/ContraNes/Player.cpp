@@ -226,10 +226,12 @@ void Player::HandleInput(float gameTime)
 	
 
 	// if the down arrow and space are pressed at the same time, move the sprite down
-	if (GetAsyncKeyState(Keyboard::DOWN) && GetAsyncKeyState(Keyboard::JUMP))
+	if (GetAsyncKeyState(Keyboard::DOWN) & 0x8000 && GetAsyncKeyState(Keyboard::JUMP) & 0x8000)
 	{
 		if (!hasJumped && jumpCount > 0)
 		{
+			hasJumped = true;
+
 			jumpCount -= 1;
 			jumpVelocity = 0;
 			this->jumpDown = true;
@@ -237,7 +239,7 @@ void Player::HandleInput(float gameTime)
 		movementVector.y += 1;
 	}
 
-	if (SHORT s = GetAsyncKeyState(Keyboard::JUMP))
+	if (SHORT s = GetAsyncKeyState(Keyboard::JUMP)) // equal sign on purpose, not a typo
 	{
 		if (!hasJumped && jumpCount > 0 && ((s & 0x8001) == 0x8001))
 		{
@@ -250,30 +252,30 @@ void Player::HandleInput(float gameTime)
 	else hasJumped = false;
 
 	// if the up arrow is pressed, move the sprite up
-	if (GetAsyncKeyState(Keyboard::UP)) {
+	if (GetAsyncKeyState(Keyboard::UP) & 0x8000) {
 		directionVector.y -= 1;
 	}
 	
-	if (GetAsyncKeyState(Keyboard::DOWN)) {
+	if (GetAsyncKeyState(Keyboard::DOWN) & 0x8000) {
 		directionVector.y += 1;
 	}
 
 	// if the left arrow is pressed, move the sprite left
-	if (GetAsyncKeyState(Keyboard::LEFT))
+	if (GetAsyncKeyState(Keyboard::LEFT) & 0x8000)
 	{
 		movementVector.x -= 1;
 		directionVector.x -= 1;
 	}
 
 	// if the right arrow is pressed, move the sprite right
-	if (GetAsyncKeyState(Keyboard::RIGHT))
+	if (GetAsyncKeyState(Keyboard::RIGHT) & 0x8000)
 	{
 		movementVector.x += 1;
 		directionVector.x += 1;
 	}
 
 	// if the F key is pressed, fire a bullet
-	if (GetAsyncKeyState(Keyboard::SHOOT))
+	if (GetAsyncKeyState(Keyboard::SHOOT) & 0x8000)
 	{
 	}
 
