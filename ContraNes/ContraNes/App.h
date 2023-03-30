@@ -42,4 +42,7 @@ private:
 
 	int width;
 	int height;
+
+	bool pause = false;
+	bool debugMode = false;
 };

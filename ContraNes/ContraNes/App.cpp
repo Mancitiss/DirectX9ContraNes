@@ -53,14 +53,21 @@ ID3DXSprite* pSprite;
 bool App::InitObjects()
 {
 	platforms.push_back(new StandableObject(-100,480,10000,1000, false)); // 0
-	platforms.push_back(new StandableObject(50, 200, 1450, 50, true)); // 1
+	platforms.push_back(new StandableObject(50, 210, 1450, 50, true)); // 1
 	platforms.push_back(new StandableObject(300, 270, 200, 50, true));
 	platforms.push_back(new StandableObject(500, 340, 60, 50, true));
 	platforms.push_back(new StandableObject(560, 400, 130, 50, true));
 	platforms.push_back(new StandableObject(690, 340, 60, 50, true)); // 5
 	platforms.push_back(new StandableObject(800, 270, 140, 50, true));
 	platforms.push_back(new StandableObject(1190, 400, 140, 50, true));
-	platforms.push_back(new StandableObject(1250, 300, 190, 50, true));
+	platforms.push_back(new StandableObject(1250, 300, 190, 150, true));
+	platforms.push_back(new StandableObject(1750, 210, 320, 150, true));
+	platforms.push_back(new StandableObject(2320, 210, 500, 160, true)); // 10
+	platforms.push_back(new StandableObject(2700, 150, 1000, 250, true));
+	platforms.push_back(new StandableObject(2760, 390, 200, 30, true));
+	platforms.push_back(new StandableObject(2950, 300, 120, 90, true));
+	platforms.push_back(new StandableObject(3130, 270, 400, 80, true));
+	platforms.push_back(new StandableObject(3390, 390, 360, 30, true)); // 15
 
 
 	background = new GameplayObject(0, 0, 1.0f, 0, 0, 0);
@@ -85,7 +92,10 @@ bool App::Init()
 	if (!ContraApp::Init())
 		return false;
 
-	camera = new Camera(0, 0, 0, width, height, 0, D3DXVECTOR3(2.0f, 2.0f, 1.0f));
+	int cWidth = (m_uiClientWidth / 512) * 512;
+	int cHeight = (m_uiClientHeight / 480) * 480;
+	D3DXVECTOR3 scale = D3DXVECTOR3((float)cWidth / 512, (float)cHeight / 480, 1.0f);
+	camera = new Camera(0, 0, 0, cWidth, cHeight, 0, scale);
 
 
 	// initialize game objects / check game object creation
@@ -114,10 +124,15 @@ bool App::Init()
 
 void App::Update(float gameTime)
 {
-	if (GetAsyncKeyState(VK_ESCAPE)) 
+	if ((GetAsyncKeyState(VK_F3) & 0x8001) == 0x8001)
 	{
-		PostQuitMessage(0);
+		debugMode = !debugMode;
 	}
+	if ((GetAsyncKeyState(VK_ESCAPE) & 0x8001) == 0x8001) 
+	{
+		pause = !pause;
+	}
+	if (pause) return;
 
 	if (player2 && player2->IsInitialized())
 	{
@@ -187,8 +202,8 @@ void App::Render(float gameTime)
 		}
 	}
 
-	if (font) {
-		message = ConvertToLPCWSTR(std::to_string(player->GetPosition().x) + " " + std::to_string(player->GetPosition().y) + "\n" + std::to_string(player->GetPosition().x + player->GetSprite()->spriteWidth) + " " + std::to_string(player->GetPosition().y + player->GetSprite()->spriteHeight));
+	if (font && debugMode) {
+		message = ConvertToLPCWSTR("Player Top Left: " + std::to_string(player->GetPosition().x) + " " + std::to_string(player->GetPosition().y) + "\n" + "Player Bottom Right: " + std::to_string(player->GetPosition().x + player->GetSprite()->spriteWidth) + " " + std::to_string(player->GetPosition().y + player->GetSprite()->spriteHeight));
 		font->DrawTextW(NULL, message, -1, &messageRect, DT_LEFT, D3DCOLOR_ARGB(255, 255, 255, 0));
 	}
 
