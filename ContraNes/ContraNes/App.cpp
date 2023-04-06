@@ -175,6 +175,12 @@ void App::Update(float gameTime)
 		camera->Update(gameTime);
 	}
 
+	if (player->GetPosition().y > 10000) { 
+		// reset player position if they fall off the map somehow
+		// we will do the same for other objects later
+		// but instead of resetting their position, we will just destroy them
+		player->SetPositionY(0);
+	}
 }
 
 void App::Render(float gameTime)

@@ -160,7 +160,9 @@
     <ClInclude Include="GameSprite.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Monster.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Runner.h" />
     <ClInclude Include="StandableObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

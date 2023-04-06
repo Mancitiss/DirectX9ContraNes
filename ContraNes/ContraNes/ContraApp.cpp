@@ -21,8 +21,8 @@ ContraApp::ContraApp(HINSTANCE hInstance)
 {
 	m_hAppInstance = hInstance;
 	m_hAppWnd = NULL; 
-	m_uiClientWidth = 800;
-	m_uiClientHeight = 600;
+	m_uiClientWidth = 512;
+	m_uiClientHeight = 480;
 	/*m_uiClientWidth = 1024;
 	m_uiClientHeight = 960;*/
 	/*m_uiClientWidth = 1280;
