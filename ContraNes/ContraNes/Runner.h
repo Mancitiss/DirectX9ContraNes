@@ -10,8 +10,6 @@ public:
 
 	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1)) override;
 
-	virtual void Update(float gameTime) override;
-
 	virtual void ApplyCollision(GameplayObject* const& object, float gameTime) override;
 
 	virtual void ApplyCollision(Player* const& object, float gameTime) override;

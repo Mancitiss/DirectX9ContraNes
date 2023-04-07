@@ -5,6 +5,7 @@
 #include "App.h"
 #include "d3dUtil.h"
 #include "Player.h"
+#include "Runner.h"
 
 App::App(HINSTANCE hInstance) : ContraApp(hInstance)
 {
@@ -68,6 +69,9 @@ bool App::InitObjects()
 	platforms.push_back(new StandableObject(2950, 300, 120, 90, true));
 	platforms.push_back(new StandableObject(3130, 270, 400, 80, true));
 	platforms.push_back(new StandableObject(3390, 390, 360, 30, true)); // 15
+
+	monsters.push_back(new Runner(1450, 140, 0, 300, 300));
+	monsters[0]->Init(m_pDevice3D, 0.15f);
 
 
 	background = new GameplayObject(0, 0, 1.0f, 0, 0, 0);
@@ -145,6 +149,7 @@ void App::Update(float gameTime)
 		player->HandleInput(gameTime);
 		player->Update(gameTime);
 	}
+
 	RECT playerRect = { (LONG)player->GetPosition().x, (LONG)player->GetPosition().y, (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
 	for (auto& platform : platforms)
 	{
@@ -156,9 +161,27 @@ void App::Update(float gameTime)
 		{
 			platform->ApplyCollision(player, gameTime);
 		}
+	}	
+
+	for (auto& monster : monsters)
+	{
+		if (!monster || !monster->IsInitialized() || monster->GetMoveType() == MoveType::NONE) continue;
+		monster->HandleInput(gameTime);
+		monster->Update(gameTime);
+		RECT monsterRect = { (LONG)monster->GetPosition().x, (LONG)monster->GetPosition().y, (LONG)(monster->GetPosition().x + monster->GetSprite()->spriteWidth), (LONG)(monster->GetPosition().y + monster->GetSprite()->spriteHeight) };
+		for (auto& platform : platforms)
+		{
+			RECT platformRect = platform->GetBounds();
+			if (CheckIntersection(&monsterRect, &platformRect))
+			{
+				platform->ApplyCollision(monster, gameTime);
+				break;
+			}
+		}
 	}
 
 	if (camera) {
+
 		if (GetAsyncKeyState(70)) // F
 		{
 			if (!camera->IsFollowing()) 
@@ -173,6 +196,30 @@ void App::Update(float gameTime)
 			}
 		}
 		camera->Update(gameTime);
+
+		RECT cam = camera->GetBounds();
+		for (auto& monster : monsters)
+		{
+			if (monster && monster->IsInitialized())
+			{
+				// log monster position
+				OutputDebugString(ConvertToLPCWSTR("M: " + std::to_string(monster->GetPosition().x) + " " + std::to_string(monster->GetPosition().y) + ""));
+				RECT monsterRect = { (LONG)monster->GetPosition().x, (LONG)monster->GetPosition().y, (LONG)(monster->GetPosition().x + monster->GetSprite()->spriteWidth), (LONG)(monster->GetPosition().y + monster->GetSprite()->spriteHeight) };
+				if (CheckIntersection(&monsterRect, &cam))
+				{
+					monster->SetMoveType(MoveType::LEFT);
+				}
+				else if (monster->GetMoveType() != MoveType::NONE)
+				{
+					// delete monster and remove it from the vector
+					monsters.erase(std::remove(monsters.begin(), monsters.end(), monster), monsters.end());
+					//delete monster; // don't have to delete it, it will be deleted by the vector
+					monster = NULL;
+					// log
+					OutputDebugString(L"Monster deleted\n");
+				}
+			}
+		}
 	}
 
 	if (player->GetPosition().y > 10000) { 
@@ -206,10 +253,25 @@ void App::Render(float gameTime)
 		{
 			camera->Render(player2);
 		}
+
+		if (monsters.size() > 0)
+		{
+			for (auto& monster : monsters)
+			{
+				camera->Render(monster);
+			}
+		}
 	}
 
 	if (font && debugMode) {
-		message = ConvertToLPCWSTR("Player Top Left: " + std::to_string(player->GetPosition().x) + " " + std::to_string(player->GetPosition().y) + "\n" + "Player Bottom Right: " + std::to_string(player->GetPosition().x + player->GetSprite()->spriteWidth) + " " + std::to_string(player->GetPosition().y + player->GetSprite()->spriteHeight));
+		message = ConvertToLPCWSTR("Player Top Left: " + std::to_string(player->GetPosition().x) + " " 
+			+ std::to_string(player->GetPosition().y) + "\n" + "Player Bottom Right: " 
+			+ std::to_string(player->GetPosition().x + player->GetSprite()->spriteWidth) + " " 
+			+ std::to_string(player->GetPosition().y + player->GetSprite()->spriteHeight)
+		    /*camera position and size*/
+			+ "\n" + "Camera Top Left: " + std::to_string(camera->GetBounds().left) + " " + std::to_string(camera->GetBounds().top) 
+			+ "\n" + "Camera Bottom Right: " + std::to_string(camera->GetBounds().right) + " " + std::to_string(camera->GetBounds().bottom)
+		);
 		font->DrawTextW(NULL, message, -1, &messageRect, DT_LEFT, D3DCOLOR_ARGB(255, 255, 255, 0));
 	}
 

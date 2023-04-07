@@ -16,6 +16,7 @@ public:
 	void Render(GameplayObject* object, float gameTime = 0);
 	void Render(GameSprite* sprite, float gameTime = 0);
 	void SetLimit(float x, float y, float width, float height);
+	RECT GetBounds() const;
 
 	D3DXMATRIX transformationMatrix;
 

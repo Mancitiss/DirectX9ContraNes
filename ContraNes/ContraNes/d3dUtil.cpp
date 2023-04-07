@@ -25,13 +25,14 @@ void GetPngImageDimensions(std::string& file_path, unsigned int& width, unsigned
 	height = (buf[4] << 24) + (buf[5] << 16) + (buf[6] << 8) + (buf[7] << 0);
 }
 
-bool CreateSprites(LPDIRECT3DDEVICE9 device, int N, const std::string& prefix, const std::string& ext, GameSprite*& first, GameSprite*& pDefault, D3DXVECTOR3& internalScale, int i = 1, std::string separator = "-")
+bool CreateSprites(LPDIRECT3DDEVICE9 device, int N, const std::string& prefix, const std::string& ext, GameSprite*& first, GameSprite*& pDefault, D3DXVECTOR3& internalScale, int i, std::string separator)
 {
     std::string filename;
     GameSprite* current = nullptr;
 
     // Loop through each sprite index and create a new GameSprite
-    for (i; i < i+N; i++)
+    int end = i + N;
+    for (i; i < end; i++)
     {
         // Construct the filename for the current sprite
         filename = prefix + separator + std::to_string(i) + ext;

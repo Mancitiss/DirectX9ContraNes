@@ -1,4 +1,5 @@
 #include "Runner.h"
+#include "d3dUtil.h"
 
 void Runner::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 {
@@ -38,6 +39,14 @@ void Runner::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 Runner::~Runner()
 {
 	this->target = nullptr;
+
+	DeleteCircularList(this->pIdleRight);
+	DeleteCircularList(this->pIdleLeft);
+
+	DeleteCircularList(this->pMoveRight);
+	DeleteCircularList(this->pMoveLeft);
+
+	this->sprite = nullptr;
 }
 
 bool Runner::Init(LPDIRECT3DDEVICE9 device, float frameDelay, D3DXVECTOR3 internalScale)
@@ -47,7 +56,7 @@ bool Runner::Init(LPDIRECT3DDEVICE9 device, float frameDelay, D3DXVECTOR3 intern
 	if (!this->pIdleRight)
 	{
 		this->pIdleRight = new GameSprite();
-		if (!this->pIdleRight->Init(device, L"resources/enemy/runner/7.png", 24, 34, 0, internalScale))
+		if (!this->pIdleRight->Init(device, L"resources/enemy/runner/7.png", 21, 45, 0, internalScale))
 		{
 			return false;
 		}
@@ -58,11 +67,45 @@ bool Runner::Init(LPDIRECT3DDEVICE9 device, float frameDelay, D3DXVECTOR3 intern
 	if (!this->pIdleLeft)
 	{
 		this->pIdleLeft = new GameSprite();
-		if (!this->pIdleLeft->Init(device, L"resources/player/L.png", 24, 34, 0, internalScale))
+		if (!this->pIdleLeft->Init(device, L"resources/enemy/runner/10.png", 21, 45, 0, internalScale))
 		{
 			return false;
 		}
 		this->pIdleLeft->pDefault = this->pIdleLeft;
 		this->pIdleLeft->pNext = this->pIdleLeft;
 	}
+
+	if (!this->pMoveRight)
+	{
+		if (!CreateSprites(device, 9, "resources/enemy/runner/", ".png", this->pMoveRight, this->pIdleRight, internalScale, 9, "")) 
+		{ 
+			return false; 
+		}
+	}
+
+	if (!this->pMoveLeft)
+	{
+		if (!CreateSprites(device, 9, "resources/enemy/runner/", ".png", this->pMoveLeft, this->pIdleLeft, internalScale, 0, ""))
+		{
+			return false;
+		}
+	}
+
+	this->sprite = this->pIdleRight;
+
+	this->frameDelay = frameDelay;
+	this->frameTime = frameDelay;
+
+	this->initialized = true;
+	return true;
+}
+
+void Runner::ApplyCollision(GameplayObject* const& object, float gameTime)
+{
+	// do nothing for now
+}
+
+void Runner::ApplyCollision(Player* const& object, float gameTime)
+{
+	// do nothing for now
 }

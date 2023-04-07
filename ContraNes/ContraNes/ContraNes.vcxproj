@@ -147,6 +147,7 @@
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Runner.cpp" />
     <ClCompile Include="StandableObject.cpp" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>

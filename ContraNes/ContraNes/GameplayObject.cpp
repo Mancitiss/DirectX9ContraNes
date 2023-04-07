@@ -128,7 +128,7 @@ void GameplayObject::SetSpeed(float speed)
 
 GameSprite* GameplayObject::GetSprite() const
 {
-	return sprite;
+	return this->sprite;
 }
 
 D3DXVECTOR3 GameplayObject::GetPosition() const

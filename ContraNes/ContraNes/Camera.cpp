@@ -114,3 +114,13 @@ void Camera::Render(GameSprite* sprite, float gameTime)
 		sprite->Draw(&relativePosition);
 	}
 }
+
+RECT Camera::GetBounds() const
+{
+	RECT bounds;
+	bounds.left = this->position.x;
+	bounds.top = this->position.y;
+	bounds.right = this->position.x + this->width / scaleFactors.x;
+	bounds.bottom = this->position.y + this->height / scaleFactors.y;
+	return bounds;
+}
