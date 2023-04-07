@@ -10,7 +10,7 @@ public:
 
 	Player(float x, float y, float z, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1));
 
-	~Player();
+	virtual ~Player();
 
 	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1));
 
@@ -18,41 +18,44 @@ public:
 
 	virtual void Update(float gameTime) override;
 
-	virtual D3DXVECTOR3 GetVelocity() const override;
+	D3DXVECTOR3 GetVelocity() const override;
 
-	virtual D3DXVECTOR3 GetDirection() const override;
+	D3DXVECTOR3 GetDirection() const override;
 
-	virtual D3DXVECTOR3 GetMovementVector() const override;
+	D3DXVECTOR3 GetMovementVector() const override;
 
-	virtual void SetPositionX(float x) override;
+	void SetPositionX(float x) override;
 
-	virtual void SetPositionY(float y) override;
+	void SetPositionY(float y) override;
 
-	virtual void SetPositionZ(float z) override;
+	void SetPositionZ(float z) override;
 
-	virtual void SetVelocityX(float x) override;
+	void SetVelocityX(float x) override;
 
-	virtual void SetVelocityY(float y) override;
+	void SetVelocityY(float y) override;
 
-	virtual void SetVelocityZ(float z) override;
+	void SetVelocityZ(float z) override;
 
-	virtual void SetGravitationalAcceleration(float gravitationalAcceleration) override;
+	void SetGravitationalAcceleration(float gravitationalAcceleration) override;
 
-	virtual void SetJumpVelocity(float jumpVelocity) override;
+	void SetJumpVelocity(float jumpVelocity) override;
 
-	virtual void ResetJumpCount() override;
+	void ResetJumpCount() override;
 
-	virtual int GetJumpCount() const override;
+	int GetJumpCount() const override;
 
-	virtual int GetMaxJumpCount() const override;
+	int GetMaxJumpCount() const override;
 
-	virtual void SetBaseJumpVelocity(float bj) override;
+	void SetBaseJumpVelocity(float bj) override;
 
-	virtual void SetJumpDown(bool b) override;
+	void SetJumpDown(bool b) override;
 
-	virtual bool GetJumpDown() const override;
+	bool GetJumpDown() const override;
 
 protected:
+	virtual void _defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction);
+
+	int health; // TODO: implement health system
 
 	float frameTime;
 	float frameDelay;
@@ -92,4 +95,5 @@ protected:
 
 private:
 	bool hasJumped = true;
+
 };

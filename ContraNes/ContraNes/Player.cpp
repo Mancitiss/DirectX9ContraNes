@@ -219,12 +219,8 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay, D3DXVECTOR3 intern
 	return true;
 }
 
-void Player::HandleInput(float gameTime)
+void Player::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 {
-	D3DXVECTOR3 movementVector(0, 0, 0);
-	D3DXVECTOR3 directionVector(0, 0, 0);
-	
-
 	// if the down arrow and space are pressed at the same time, move the sprite down
 	if (GetAsyncKeyState(Keyboard::DOWN) & 0x8000 && GetAsyncKeyState(Keyboard::JUMP) & 0x8000)
 	{
@@ -236,7 +232,7 @@ void Player::HandleInput(float gameTime)
 			jumpVelocity = 0;
 			this->jumpDown = true;
 		}
-		movementVector.y += 1;
+		movement.y += 1;
 	}
 
 	if (SHORT s = GetAsyncKeyState(Keyboard::JUMP)) // equal sign on purpose, not a typo
@@ -247,37 +243,45 @@ void Player::HandleInput(float gameTime)
 			jumpCount -= 1;
 			jumpVelocity = baseJumpVelocity;
 		}
-		movementVector.y -= 1;
+		movement.y -= 1;
 	}
 	else hasJumped = false;
 
 	// if the up arrow is pressed, move the sprite up
 	if (GetAsyncKeyState(Keyboard::UP) & 0x8000) {
-		directionVector.y -= 1;
+		direction.y -= 1;
 	}
-	
+
 	if (GetAsyncKeyState(Keyboard::DOWN) & 0x8000) {
-		directionVector.y += 1;
+		direction.y += 1;
 	}
 
 	// if the left arrow is pressed, move the sprite left
 	if (GetAsyncKeyState(Keyboard::LEFT) & 0x8000)
 	{
-		movementVector.x -= 1;
-		directionVector.x -= 1;
+		movement.x -= 1;
+		direction.x -= 1;
 	}
 
 	// if the right arrow is pressed, move the sprite right
 	if (GetAsyncKeyState(Keyboard::RIGHT) & 0x8000)
 	{
-		movementVector.x += 1;
-		directionVector.x += 1;
+		movement.x += 1;
+		direction.x += 1;
 	}
 
 	// if the F key is pressed, fire a bullet
 	if (GetAsyncKeyState(Keyboard::SHOOT) & 0x8000)
 	{
 	}
+}
+
+void Player::HandleInput(float gameTime)
+{
+	D3DXVECTOR3 movementVector(0, 0, 0);
+	D3DXVECTOR3 directionVector(0, 0, 0);
+	
+	_defaultHandle(movementVector, directionVector);
 
 	this->movementVector = movementVector;
 
@@ -378,20 +382,7 @@ void Player::Update(float gameTime) {
 	if (status == ObjectStatus::ACTIVE)
 	{
 		position.x += velocity.x * gameTime;
-		//if (jumpStatus == JumpStatus::JUMPING)
-		//{
 		position.y += velocity.y * gameTime;
-		/*	if (position.y > 480 - this->sprite->spriteHeight)
-			{
-				position.y = 480 - this->sprite->spriteHeight;
-				jumpStatus = JumpStatus::IDLE;
-			}
-		}
-		else
-		{
-			jumpVelocity = 0;
-			velocity.y = 0;
-		}*/
 
 		position.x += this->prev->spriteWidth / 2 - this->sprite->spriteWidth / 2;
 		position.y += this->prev->spriteHeight - this->sprite->spriteHeight;
