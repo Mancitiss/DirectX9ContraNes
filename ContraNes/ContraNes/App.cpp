@@ -78,13 +78,13 @@ bool App::InitObjects()
 	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
 	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth * 1.0f, background->GetSprite()->spriteHeight * 1.0f);
 
-	player = new Player(100, 5, 0, (float)0, 300, 300, D3DXVECTOR3(2, 2, 1));
+	player = new Player(100, 5, 0, (float)0, 100, 100, D3DXVECTOR3(2, 2, 1));
 	if (!player->Init(m_pDevice3D, 0.15f)) return false;
 	player->SetJerkIncrementPerSecond3(19702.0f);
 	player->SetBaseJumpVelocity(400);
-	player->SetGravitationalAcceleration(1000);
+	player->SetGravitationalAcceleration(600);
 
-	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300, D3DXVECTOR3(2, 2, 1));
+	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300, D3DXVECTOR3(1, 1, 1));
 	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI)) return false;
 	return true;
 }
@@ -151,6 +151,8 @@ void App::Update(float gameTime)
 	}
 
 	RECT playerRect = { (LONG)player->GetPosition().x, (LONG)player->GetPosition().y, (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
+	/*player->prevCollaped = player->currentCollaped;
+	player->currentCollaped = 0;*/
 	for (auto& platform : platforms)
 	{
 		RECT platformRect = platform->GetBounds();
@@ -159,9 +161,14 @@ void App::Update(float gameTime)
 		// check collision
 		if ( CheckIntersection( &playerRect, &platformRect) )
 		{
+			//player->currentCollaped++;
 			platform->ApplyCollision(player, gameTime);
 		}
-	}	
+	}
+	/*if (player->currentCollaped != player->prevCollaped)
+	{
+		player->SetJumpDown(false);
+	}*/
 
 	for (auto& monster : monsters)
 	{
@@ -203,7 +210,7 @@ void App::Update(float gameTime)
 			if (monster && monster->IsInitialized())
 			{
 				// log monster position
-				OutputDebugString(ConvertToLPCWSTR("M: " + std::to_string(monster->GetPosition().x) + " " + std::to_string(monster->GetPosition().y) + ""));
+				//OutputDebugString(ConvertToLPCWSTR("M: " + std::to_string(monster->GetPosition().x) + " " + std::to_string(monster->GetPosition().y) + ""));
 				RECT monsterRect = { (LONG)monster->GetPosition().x, (LONG)monster->GetPosition().y, (LONG)(monster->GetPosition().x + monster->GetSprite()->spriteWidth), (LONG)(monster->GetPosition().y + monster->GetSprite()->spriteHeight) };
 				if (CheckIntersection(&monsterRect, &cam))
 				{
@@ -217,6 +224,11 @@ void App::Update(float gameTime)
 					monster = NULL;
 					// log
 					OutputDebugString(L"Monster deleted\n");
+				}
+
+				if (CheckIntersection(&playerRect, &monsterRect))
+				{
+					monster->ApplyCollision(player, gameTime);
 				}
 			}
 		}
@@ -271,6 +283,7 @@ void App::Render(float gameTime)
 		    /*camera position and size*/
 			+ "\n" + "Camera Top Left: " + std::to_string(camera->GetBounds().left) + " " + std::to_string(camera->GetBounds().top) 
 			+ "\n" + "Camera Bottom Right: " + std::to_string(camera->GetBounds().right) + " " + std::to_string(camera->GetBounds().bottom)
+			+ "\n" + "Player health: " + std::to_string(player->GetHealth())
 		);
 		font->DrawTextW(NULL, message, -1, &messageRect, DT_LEFT, D3DCOLOR_ARGB(255, 255, 255, 0));
 	}

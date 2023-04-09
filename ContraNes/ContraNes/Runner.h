@@ -8,7 +8,7 @@ public:
 	
 	virtual ~Runner();
 
-	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1)) override;
+	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0) override;
 
 	virtual void ApplyCollision(GameplayObject* const& object, float gameTime) override;
 

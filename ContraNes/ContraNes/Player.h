@@ -12,7 +12,7 @@ public:
 
 	virtual ~Player();
 
-	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1));
+	virtual bool Init(LPDIRECT3DDEVICE9 device, float frameDelay = 0);
 
 	virtual void HandleInput(float gameTime) override;
 
@@ -24,18 +24,23 @@ public:
 
 	D3DXVECTOR3 GetMovementVector() const override;
 
+	virtual GameSprite* GetPrev() const override;
+
+	// position
 	void SetPositionX(float x) override;
 
 	void SetPositionY(float y) override;
 
 	void SetPositionZ(float z) override;
 
+	// velocity
 	void SetVelocityX(float x) override;
 
 	void SetVelocityY(float y) override;
 
 	void SetVelocityZ(float z) override;
 
+	// jump related functions
 	void SetGravitationalAcceleration(float gravitationalAcceleration) override;
 
 	void SetJumpVelocity(float jumpVelocity) override;
@@ -52,10 +57,33 @@ public:
 
 	bool GetJumpDown() const override;
 
+	// damage related functions
+	virtual void TakeDamage(int damage);
+
+	int GetHealth() const;
+	
+	int GetDamage() const;
+
+	void SetHealth(int health);
+
+	void SetDamage(int damage);
+
+	void SetInvincibilityTime(float invincibilityTime);
+
+	void SetInvincibilityDelay(float invincibilityDelay);
+
+	float GetInvincibilityTime() const;
+
+	float GetInvincibilityDelay() const;
+
 protected:
 	virtual void _defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction);
 
-	int health; // TODO: implement health system
+	int health = 3; // TODO: implement health system
+	int damage = 1;
+
+	float invincibilityTime = 0.0f;
+	float invincibilityDelay = 0.5f;
 
 	float frameTime;
 	float frameDelay;
@@ -95,5 +123,4 @@ protected:
 
 private:
 	bool hasJumped = true;
-
 };

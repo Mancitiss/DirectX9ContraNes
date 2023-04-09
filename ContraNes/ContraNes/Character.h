@@ -19,6 +19,7 @@ public:
 	Character(float x, float y, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1)) : GameplayObject(x, y, rotation, speed, maxSpeed, internalScale) {};
 	Character(float x, float y, float z, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale = D3DXVECTOR3(1, 1, 1)) : GameplayObject(x, y, z, rotation, speed, maxSpeed, internalScale) {};
 	virtual ~Character() {};
+	virtual GameSprite* GetPrev() const = 0;
 	virtual D3DXVECTOR3 GetVelocity() const = 0;
 	virtual D3DXVECTOR3 GetDirection() const = 0;
 	virtual D3DXVECTOR3 GetMovementVector() const = 0;
@@ -41,6 +42,9 @@ public:
 
 	virtual void SetJumpDown(bool b) = 0;
 	virtual bool GetJumpDown() const = 0;
+
+	int prevCollaped = 0;
+	int currentCollaped = 0;
 protected:
 	int jumpCount;
 	int maxJump;

@@ -57,7 +57,7 @@ Player::~Player()
 	this->sprite = nullptr;
 }
 
-bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay, D3DXVECTOR3 internalScale)
+bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 {
 	status = ObjectStatus::ACTIVE;
 
@@ -381,6 +381,10 @@ void Player::HandleInput(float gameTime)
 void Player::Update(float gameTime) {
 	if (status == ObjectStatus::ACTIVE)
 	{
+		if (this->invincibilityTime > 0) {
+			this->invincibilityTime -= gameTime;
+		}
+
 		position.x += velocity.x * gameTime;
 		position.y += velocity.y * gameTime;
 
@@ -417,6 +421,11 @@ D3DXVECTOR3 Player::GetDirection() const
 D3DXVECTOR3 Player::GetMovementVector() const
 {
 	return this->movementVector;
+}
+
+GameSprite* Player::GetPrev() const
+{
+	return this->prev;
 }
 
 void Player::SetVelocityX(float x)
@@ -472,4 +481,57 @@ void Player::SetJumpDown(bool b)
 bool Player::GetJumpDown() const
 {
 	return this->jumpDown;
+}
+
+void Player::TakeDamage(int damage)
+{
+	if (this->status == ObjectStatus::ACTIVE && this->invincibilityTime <= 0)
+	{
+		this->health -= damage;
+		this->invincibilityTime = this->invincibilityDelay;
+		if (this->health <= 0)
+		{
+			this->status = ObjectStatus::DEAD;
+		}
+	}
+}
+
+void Player::SetHealth(int health)
+{
+	this->health = health;
+}
+
+int Player::GetHealth() const
+{
+	return this->health;
+}
+
+void Player::SetDamage(int damage)
+{
+	this->damage = damage;
+}
+
+int Player::GetDamage() const
+{
+	return this->damage;
+}
+
+void Player::SetInvincibilityTime(float invincibilityTime)
+{
+	this->invincibilityTime = invincibilityTime;
+}
+
+float Player::GetInvincibilityTime() const
+{
+	return this->invincibilityTime;
+}
+
+void Player::SetInvincibilityDelay(float invincibilityDelay)
+{
+	this->invincibilityDelay = invincibilityDelay;
+}
+
+float Player::GetInvincibilityDelay() const
+{
+	return this->invincibilityDelay;
 }

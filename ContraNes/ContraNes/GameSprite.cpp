@@ -73,8 +73,8 @@ bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int heig
 	}
 
 	// set the sprite width and height
-	spriteWidth = width;
-	spriteHeight = height;
+	spriteWidth = width * internalScale.x ;
+	spriteHeight = height * internalScale.y;
 	this->baseZRotation = baseZRotation;
 
 	// sprite is initialized

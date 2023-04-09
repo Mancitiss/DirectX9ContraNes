@@ -21,4 +21,6 @@ public:
 protected:
 	MoveType moveType = MoveType::NONE;
 	GameplayObject* target;
+
+	float invincibilityDelay = 0;
 };

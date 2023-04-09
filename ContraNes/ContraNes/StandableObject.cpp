@@ -33,13 +33,13 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 	// if the object is above the platform, then the object will be standing on the platform
 	// if the object is below the platform, then the object will be falling through the platform
 
-	float changedX = object->GetVelocity().x * gameTime;
-	float changedY = object->GetVelocity().y * gameTime;
+	float changedX = object->GetVelocity().x * gameTime + object->GetPrev()->spriteWidth / 2 - object->GetSprite()->spriteWidth / 2 ;
+	float changedY = object->GetVelocity().y * gameTime + object->GetPrev()->spriteHeight / 2 - object->GetSprite()->spriteHeight / 2;
 
 	/*if (object->GetPosition().x + object->GetSprite()->spriteWidth - changedX > platformPosition.x - forgivingWidth
 		|| object->GetPosition().x - changedX < platformPosition.x + platformWidth + forgivingWidth)
 	{*/
-		if (object->GetPosition().y + object->GetSprite()->spriteHeight - changedY <= platformPosition.y)
+		if (!object->GetJumpDown() && object->GetPosition().y + object->GetSprite()->spriteHeight - changedY - 2 < platformPosition.y)
 		{
 			// the object is above the platform
 			// the object will be standing on the platform
@@ -60,16 +60,28 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 				}
 			}
 			else { // velocity.y > 0
-				if (fallThrough && (object->GetJumpDown() || object->GetPosition().y > platformPosition.y )) {
-					
-				}
-				else // !fallThrough || (object->GetJumpCount() >= object->GetMaxJumpCount()  && object->GetPosition().y <= platformPosition.y ) 
+
+				object->SetJumpDown(false);
+				object->SetPositionY(object->GetPosition().y + 2);
+				if (!fallThrough )
 				{
 					object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight + 1);
 					object->SetVelocityY(0);
 					object->SetJumpVelocity(0);
 					object->ResetJumpCount();
+					object->SetJumpDown(false);
 				}
+				//if (fallThrough && (object->GetJumpDown() || object->GetPosition().y > platformPosition.y )) {
+				//	
+				//}
+				//else //if (!fallThrough || (!object->GetJumpDown()))// && object->GetPosition().y <= platformPosition.y ) 
+				//{
+				//	object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight + 1);
+				//	object->SetVelocityY(0);
+				//	object->SetJumpVelocity(0);
+				//	object->ResetJumpCount();
+				//	//object->SetJumpDown(false);
+				//}
 			}
 		}
 	/*}
