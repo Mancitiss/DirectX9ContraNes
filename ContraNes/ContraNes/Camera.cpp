@@ -27,10 +27,10 @@ void Camera::SetLimit(float x, float y, float width, float height)
 		limits = new RECT();
 	}
 
-	limits->left = x;
-	limits->top = y;
-	limits->right = x + width;
-	limits->bottom = y + height;
+	limits->left = static_cast<LONG>(x);
+	limits->top = static_cast<LONG>(y);
+	limits->right = static_cast<LONG>( x + width );
+	limits->bottom = static_cast<LONG>( y + height );
 
 	if (width * scaleFactors.x <= this->width) {
 		this->lockX = true;
@@ -54,7 +54,7 @@ void Camera::Update(float dt)
 			{
 				if (x < limits->left)
 				{
-					x = limits->left;
+					x = static_cast<float>(limits->left);
 				}
 				else if (x + width / scaleFactors.x > limits->right)
 				{
@@ -70,7 +70,7 @@ void Camera::Update(float dt)
 			{
 				if (y < limits->top)
 				{
-					y = limits->top;
+					y = static_cast<float>(limits->top);
 				}
 				else if (y + height / scaleFactors.y > limits->bottom)
 				{
@@ -118,9 +118,9 @@ void Camera::Render(GameSprite* sprite, float gameTime)
 RECT Camera::GetBounds() const
 {
 	RECT bounds;
-	bounds.left = this->position.x;
-	bounds.top = this->position.y;
-	bounds.right = this->position.x + this->width / scaleFactors.x;
-	bounds.bottom = this->position.y + this->height / scaleFactors.y;
+	bounds.left = static_cast<LONG>(this->position.x);
+	bounds.top = static_cast<LONG>(this->position.y);
+	bounds.right = static_cast<LONG>( this->position.x + this->width / scaleFactors.x );
+	bounds.bottom = static_cast<LONG>( this->position.y + this->height / scaleFactors.y );
 	return bounds;
 }

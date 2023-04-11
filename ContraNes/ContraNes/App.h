@@ -19,7 +19,7 @@ public:
 	~App();
 
 	// methods
-
+	int Run() override;
 	void _Run() override;
 	bool Init() override;
 	void Update(float dt) override;

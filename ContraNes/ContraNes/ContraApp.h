@@ -12,7 +12,7 @@ public:
 	virtual ~ContraApp();
 
 	// main application loop
-	int Run();
+	virtual int Run();
 
 	IDirect3DDevice9* GetDevice() const;
 

@@ -49,7 +49,7 @@ Runner::~Runner()
 	this->sprite = nullptr;
 }
 
-bool Runner::Init(LPDIRECT3DDEVICE9 device, float frameDelay, D3DXVECTOR3 internalScale)
+bool Runner::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 {
 	status = ObjectStatus::ACTIVE;
 
@@ -107,5 +107,5 @@ void Runner::ApplyCollision(GameplayObject* const& object, float gameTime)
 
 void Runner::ApplyCollision(Player* const& object, float gameTime)
 {
-	// do nothing for now
+	object->TakeDamage(this->damage);
 }
