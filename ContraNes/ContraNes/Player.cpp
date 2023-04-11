@@ -221,24 +221,32 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 void Player::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 {
+	SHORT UP, DOWN, LEFT, RIGHT, JUMP, SHOOT;
+	UP = GetAsyncKeyState(Keyboard::UP);
+	DOWN = GetAsyncKeyState(Keyboard::DOWN);
+	LEFT = GetAsyncKeyState(Keyboard::LEFT);
+	RIGHT = GetAsyncKeyState(Keyboard::RIGHT);
+	JUMP = GetAsyncKeyState(Keyboard::JUMP);
+	SHOOT = GetAsyncKeyState(Keyboard::SHOOT);
 	// if the down arrow and space are pressed at the same time, move the sprite down
-	if (GetAsyncKeyState(Keyboard::DOWN) & 0x8000 && GetAsyncKeyState(Keyboard::JUMP) & 0x8000)
+	if (DOWN & 0x8000 && (JUMP & 0x8001) == 0x8001)
 	{
 		if (!hasJumped && jumpCount > 0)
 		{
+			//OutputDebugString(L"Jumping Down\n");
 			hasJumped = true;
 
 			jumpCount -= 1;
-			jumpVelocity = 0;
+			jumpVelocity = 0.0f;
 			this->jumpDown = true;
 		}
 		movement.y += 1;
 	}
-
-	if (SHORT s = GetAsyncKeyState(Keyboard::JUMP)) // equal sign on purpose, not a typo
+	else if (JUMP) 
 	{
-		if (!hasJumped && jumpCount > 0 && ((s & 0x8001) == 0x8001))
+		if (!hasJumped && jumpCount > 0 && ((JUMP & 0x8001) == 0x8001))
 		{
+			//OutputDebugString(L"Jumping\n");
 			hasJumped = true;
 			jumpCount -= 1;
 			jumpVelocity = baseJumpVelocity;
@@ -248,30 +256,31 @@ void Player::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 	else hasJumped = false;
 
 	// if the up arrow is pressed, move the sprite up
-	if (GetAsyncKeyState(Keyboard::UP) & 0x8000) {
+	if (UP & 0x8000) {
 		direction.y -= 1;
 	}
 
-	if (GetAsyncKeyState(Keyboard::DOWN) & 0x8000) {
+	if (DOWN & 0x8000) {
 		direction.y += 1;
+		//OutputDebugString(L"Down\n");
 	}
 
 	// if the left arrow is pressed, move the sprite left
-	if (GetAsyncKeyState(Keyboard::LEFT) & 0x8000)
+	if (LEFT & 0x8000)
 	{
 		movement.x -= 1;
 		direction.x -= 1;
 	}
 
 	// if the right arrow is pressed, move the sprite right
-	if (GetAsyncKeyState(Keyboard::RIGHT) & 0x8000)
+	if (RIGHT & 0x8000)
 	{
 		movement.x += 1;
 		direction.x += 1;
 	}
 
 	// if the F key is pressed, fire a bullet
-	if (GetAsyncKeyState(Keyboard::SHOOT) & 0x8000)
+	if (SHOOT & 0x8000)
 	{
 	}
 }
@@ -294,7 +303,7 @@ void Player::HandleInput(float gameTime)
 	currentVelocity = min(currentVelocity + currentAcceleration * gameTime, maxSpeed);
 	velocity.x = movementVector.x * currentVelocity;
 	//if (jumpCount < maxJump) {
-		if (movementVector.y >= 0 && jumpVelocity > 0) jumpVelocity = - gravitationalAcceleration * gameTime;
+		if (movementVector.y >= 0 && jumpVelocity >= 0) jumpVelocity = - gravitationalAcceleration * gameTime;
 		velocity.y = - jumpVelocity;
 		jumpVelocity -= gravitationalAcceleration * gameTime;
 	//}

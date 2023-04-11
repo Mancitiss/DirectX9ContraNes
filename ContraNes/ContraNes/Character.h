@@ -1,5 +1,6 @@
 #pragma once
 #include "GameplayObject.h"
+#include <unordered_set>
 
 enum class Waterlogged {
 	YES,
@@ -45,6 +46,8 @@ public:
 
 	int prevCollaped = 0;
 	int currentCollaped = 0;
+
+	std::unordered_set<GameplayObject*> ignore;
 protected:
 	int jumpCount;
 	int maxJump;

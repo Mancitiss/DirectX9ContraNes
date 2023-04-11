@@ -43,7 +43,8 @@ bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int heig
 		return false;
 	}*/
 
-	HRESULT hr = D3DXCreateTextureFromFileEx(device, rss, width*internalScale.x, height*internalScale.y,
+	HRESULT hr = D3DXCreateTextureFromFileEx(device, rss, 
+		static_cast<UINT>(width*internalScale.x), static_cast<UINT>(height*internalScale.y),
 		1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, backColor,
 		NULL, NULL, &tex);
 	if (FAILED(hr))
@@ -73,8 +74,8 @@ bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int heig
 	}
 
 	// set the sprite width and height
-	spriteWidth = width * internalScale.x ;
-	spriteHeight = height * internalScale.y;
+	spriteWidth = static_cast<int>( width * internalScale.x );
+	spriteHeight = static_cast<int>( height * internalScale.y );
 	this->baseZRotation = baseZRotation;
 
 	// sprite is initialized

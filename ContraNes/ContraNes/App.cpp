@@ -42,11 +42,46 @@ App::~App()
 	}
 }
 
+int App::Run()
+{
+	// main message loop
+	MSG msg = { 0 };
+	while (msg.message != WM_QUIT)
+	{
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			switch (msg.message)
+			{
+			default:
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+				break;
+			}
+		}
+		//else
+		//{
+			this->_Run();
+		//}
+	}
+
+	return static_cast<int>(msg.wParam);
+}
+
 void App::_Run() 
 {
+	static constexpr float kTargetFrameTime = 1.0f / 60.0f; // 60 FPS
+	static float sAccumulatedTime = 0.0f;
+
 	gameTime->Update();
-	Update(gameTime->elapsedGameTime);
-	Render(gameTime->elapsedGameTime);
+
+	sAccumulatedTime += gameTime->elapsedGameTime;
+	while ( sAccumulatedTime >= kTargetFrameTime )
+	{
+		Update(kTargetFrameTime);
+		Render(kTargetFrameTime);
+
+		sAccumulatedTime -= kTargetFrameTime;
+	}
 }
 
 ID3DXSprite* pSprite;
@@ -78,10 +113,10 @@ bool App::InitObjects()
 	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
 	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth * 1.0f, background->GetSprite()->spriteHeight * 1.0f);
 
-	player = new Player(100, 5, 0, (float)0, 100, 100, D3DXVECTOR3(2, 2, 1));
+	player = new Player(100, 5, 0, (float)0, 200, 200, D3DXVECTOR3(2, 2, 1));
 	if (!player->Init(m_pDevice3D, 0.15f)) return false;
 	player->SetJerkIncrementPerSecond3(19702.0f);
-	player->SetBaseJumpVelocity(400);
+	player->SetBaseJumpVelocity(350);
 	player->SetGravitationalAcceleration(600);
 
 	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300, D3DXVECTOR3(1, 1, 1));
@@ -151,24 +186,20 @@ void App::Update(float gameTime)
 	}
 
 	RECT playerRect = { (LONG)player->GetPosition().x, (LONG)player->GetPosition().y, (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
-	/*player->prevCollaped = player->currentCollaped;
-	player->currentCollaped = 0;*/
+
 	for (auto& platform : platforms)
 	{
 		RECT platformRect = platform->GetBounds();
-		//OutputDebugString(ConvertToLPCWSTR(std::to_string(platformRect.left) + " " + std::to_string(platformRect.top) + " " + std::to_string(platformRect.right) + " " + std::to_string(platformRect.bottom) + "\n"));
-		//OutputDebugString(ConvertToLPCWSTR("P: " + std::to_string(playerRect.left) + " " + std::to_string(playerRect.top) + " " + std::to_string(playerRect.right) + " " + std::to_string(playerRect.bottom) + "\n"));
-		// check collision
-		if ( CheckIntersection( &playerRect, &platformRect) )
+		if ( CheckIntersection( &playerRect, &platformRect) && (player->ignore.find(platform) == player->ignore.end()) )
 		{
 			//player->currentCollaped++;
 			platform->ApplyCollision(player, gameTime);
 		}
+		else if (player->ignore.find(platform) != player->ignore.end())
+		{
+			player->ignore.erase(platform);
+		}
 	}
-	/*if (player->currentCollaped != player->prevCollaped)
-	{
-		player->SetJumpDown(false);
-	}*/
 
 	for (auto& monster : monsters)
 	{
@@ -223,7 +254,7 @@ void App::Update(float gameTime)
 					//delete monster; // don't have to delete it, it will be deleted by the vector
 					monster = NULL;
 					// log
-					OutputDebugString(L"Monster deleted\n");
+					//OutputDebugString(L"Monster deleted\n");
 				}
 
 				if (CheckIntersection(&playerRect, &monsterRect))
@@ -240,6 +271,10 @@ void App::Update(float gameTime)
 		// but instead of resetting their position, we will just destroy them
 		player->SetPositionY(0);
 	}
+
+	//OutputDebugString(ConvertToLPCWSTR("Camera position: " + std::to_string(camera->GetBounds().left) + " " + std::to_string(camera->GetBounds().top) + "\n"));
+
+	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gameTime) + "\n"));
 }
 
 void App::Render(float gameTime)
