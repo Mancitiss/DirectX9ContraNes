@@ -76,6 +76,8 @@ public:
 
 	float GetInvincibilityDelay() const;
 
+	bool respawn = false;
+
 protected:
 	virtual void _defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction);
 
@@ -115,6 +117,9 @@ protected:
 	GameSprite* pIdleUp;
 	GameSprite* pIdleDownLeft;
 	GameSprite* pIdleDownRight;
+
+	GameSprite* pDieLeft;
+	GameSprite* pDieRight;
 
 	/*GameSprite* pShootWR;
 	GameSprite* pShootWL;

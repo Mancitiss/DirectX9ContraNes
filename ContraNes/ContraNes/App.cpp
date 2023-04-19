@@ -105,7 +105,7 @@ bool App::InitObjects()
 	platforms.push_back(new StandableObject(3130, 270, 400, 80, true));
 	platforms.push_back(new StandableObject(3390, 390, 360, 30, true)); // 15
 
-	monsters.push_back(new Runner(1450, 140, 0, 300, 300));
+	monsters.push_back(new Runner(1450, 140, 0, 100, 100));
 	monsters[0]->Init(m_pDevice3D, 0.15f);
 
 
@@ -183,6 +183,55 @@ void App::Update(float gameTime)
 	{
 		player->HandleInput(gameTime);
 		player->Update(gameTime);
+		if (player->respawn)
+		{
+			// find direction of the map 
+			D3DXVECTOR3 dir = D3DXVECTOR3(0, 0, 0);
+			for (int i = 0; i < platforms.size() - 1; i++)
+			{
+				if (platforms[i]->GetBounds().left < platforms[i + 1]->GetBounds().left)
+				{
+					dir.x += 1;
+				}
+				else if (platforms[i]->GetBounds().left > platforms[i + 1]->GetBounds().left)
+				{
+					dir.x -= 1;
+				}
+			}
+			for (int i = 0; i < platforms.size() - 1; i++)
+			{
+				if (platforms[i]->GetBounds().top < platforms[i + 1]->GetBounds().top)
+				{
+					dir.y += 1;
+				}
+				else if (platforms[i]->GetBounds().top > platforms[i + 1]->GetBounds().top)
+				{
+					dir.y -= 1;
+				}
+			}
+
+			// find the nearest platform to respawn
+			float minDistance = 1000000;
+			int minIndex = 0;
+			for (int i = 0; i < platforms.size(); i++)
+			{
+				// check if the platform is behind the player by using the direction vector above
+				D3DXVECTOR3 minus = player->GetPosition() - platforms[i]->GetPosition();
+				if (D3DXVec3Dot(&minus, &dir) < 0)
+					continue;
+				float distance = D3DXVec3Length(&minus);
+				if (distance < minDistance)
+				{
+					minDistance = distance;
+					minIndex = i;
+				}
+			}
+			player->SetPositionX(platforms[minIndex]->GetPosition().x);
+			player->SetPositionY(platforms[minIndex]->GetPosition().y);
+
+			player->respawn = false;
+
+		}
 	}
 
 	RECT playerRect = { (LONG)player->GetPosition().x, (LONG)player->GetPosition().y, (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };

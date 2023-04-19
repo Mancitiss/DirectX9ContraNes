@@ -210,6 +210,37 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 			return false;
 		}
 	}
+
+	if (!this->pDieLeft)
+	{
+		if (!CreateSprites(device, 5, "resources/player/DyingL", ".png", this->pDieLeft, this->pIdleRight, internalScale))
+		{
+			return false;
+		}
+	}
+
+	GameSprite* pSprite = this->pDieLeft;
+	while (pSprite->pNext != this->pDieLeft)
+	{
+		pSprite = pSprite->pNext;
+	}
+	pSprite->pNext = pSprite;
+
+	if (!this->pDieRight)
+	{
+		if (!CreateSprites(device, 5, "resources/player/DyingR", ".png", this->pDieRight, this->pIdleLeft, internalScale))
+		{
+			return false;
+		}
+	}
+
+	pSprite = this->pDieRight;
+	while (pSprite->pNext != this->pDieRight)
+	{
+		pSprite = pSprite->pNext;
+	}
+	pSprite->pNext = pSprite;
+
 	this->sprite = this->pIdleRight;
 
 	this->frameDelay = frameDelay;
@@ -287,6 +318,7 @@ void Player::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 
 void Player::HandleInput(float gameTime)
 {
+
 	D3DXVECTOR3 movementVector(0, 0, 0);
 	D3DXVECTOR3 directionVector(0, 0, 0);
 	
@@ -310,6 +342,8 @@ void Player::HandleInput(float gameTime)
 	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gravitationalAcceleration) + " " + std::to_string(gameTime) + " " + std::to_string(jumpVelocity) + ", " + std::to_string(velocity.y) + ", " + std::to_string(0 + (jumpStatus == JumpStatus::JUMPING)) + "\n"));
 
 	this->prev = this->sprite;
+
+	if (status != ObjectStatus::ACTIVE) return;
 
 	if (this->frameTime <= 0)
 	{
@@ -387,18 +421,51 @@ void Player::HandleInput(float gameTime)
 
 }
 
-void Player::Update(float gameTime) {
-	if (status == ObjectStatus::ACTIVE)
+void Player::Update(float gameTime) 
+{
+
+	//if (status == ObjectStatus::ACTIVE)
+	//{
+	if (this->invincibilityTime > 0) {
+		this->invincibilityTime -= gameTime;
+	}
+
+	position.x += velocity.x * gameTime;
+	position.y += velocity.y * gameTime;
+
+	position.x += this->prev->spriteWidth / 2 - this->sprite->spriteWidth / 2;
+	position.y += this->prev->spriteHeight - this->sprite->spriteHeight;
+	//}
+	//else 
+
+	if (status == ObjectStatus::DEAD && health > 0) 
 	{
-		if (this->invincibilityTime > 0) {
+		this->status = ObjectStatus::ACTIVE;
+		this->invincibilityTime = 1;
+		this->prev = this->sprite;
+		this->sprite = this->pIdleRight;
+		this->respawn = true;
+	}
+	else if (status == ObjectStatus::DYING)
+	{
+		/*if (this->invincibilityTime > 0) {
 			this->invincibilityTime -= gameTime;
+		}*/
+		if (this->frameTime <= 0)
+		{
+			this->frameTime = this->frameDelay;
 		}
-
-		position.x += velocity.x * gameTime;
-		position.y += velocity.y * gameTime;
-
-		position.x += this->prev->spriteWidth / 2 - this->sprite->spriteWidth / 2;
-		position.y += this->prev->spriteHeight - this->sprite->spriteHeight;
+		else
+		{
+			this->frameTime -= gameTime;
+			return;
+		}
+		if (this->sprite->pNext == this->sprite && this->invincibilityTime <= 0) {
+			this->status = ObjectStatus::DEAD;
+		}
+		else {
+			this->sprite = this->sprite->pNext;
+		}
 	}
 }
 
@@ -501,6 +568,13 @@ void Player::TakeDamage(int damage)
 		if (this->health <= 0)
 		{
 			this->status = ObjectStatus::DEAD;
+		}
+		else
+		{
+			this->status = ObjectStatus::DYING;
+			this->invincibilityTime = 1;
+			if (facing == Facing::LEFT) this->sprite = this->pDieLeft;
+			else this->sprite = this->pDieRight;
 		}
 	}
 }
