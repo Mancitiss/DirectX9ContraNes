@@ -53,6 +53,25 @@ Player::~Player()
 	DeleteCircularList(pIdleDownRight);
 	DeleteCircularList(pIdleUpLeft);
 	DeleteCircularList(pIdleUpRight);
+	
+	// pDieLeft and pDieRight are not circular list but are linked list so we need to delete them differently
+	GameSprite* pSprite = pDieLeft;
+	while (pSprite)
+	{
+		GameSprite* pNext = nullptr;
+		if (pSprite->pNext != pSprite) pNext = pSprite->pNext;
+		delete pSprite;
+		pSprite = pNext;
+	}
+
+	pSprite = pDieRight;
+	while (pSprite)
+	{
+		GameSprite* pNext = nullptr;
+		if (pSprite->pNext != pSprite) pNext = pSprite->pNext;
+		delete pSprite;
+		pSprite = pNext;
+	}
 
 	this->sprite = nullptr;
 }
@@ -252,6 +271,7 @@ bool Player::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 
 void Player::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 {
+	if (this->status != ObjectStatus::ACTIVE) return;
 	SHORT UP, DOWN, LEFT, RIGHT, JUMP, SHOOT;
 	UP = GetAsyncKeyState(Keyboard::UP);
 	DOWN = GetAsyncKeyState(Keyboard::DOWN);
@@ -423,7 +443,6 @@ void Player::HandleInput(float gameTime)
 
 void Player::Update(float gameTime) 
 {
-
 	//if (status == ObjectStatus::ACTIVE)
 	//{
 	if (this->invincibilityTime > 0) {
