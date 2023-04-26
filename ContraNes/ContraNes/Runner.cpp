@@ -97,6 +97,10 @@ bool Runner::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 	this->frameTime = frameDelay;
 
 	this->initialized = true;
+
+	this->health = 1;
+	this->damage = 1;
+
 	return true;
 }
 

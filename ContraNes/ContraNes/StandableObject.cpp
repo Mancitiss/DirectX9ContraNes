@@ -19,12 +19,23 @@ StandableObject::~StandableObject()
 {
 }
 
+void StandableObject::Update(float gametime)
+{
+	GameplayObject::Update(gametime);
+	platformPosition.x += velocity.x * gametime;
+	platformPosition.y += velocity.y * gametime;
+	bounds.left = (LONG)platformPosition.x;
+	bounds.top = (LONG)platformPosition.y;
+	bounds.right = (LONG)(platformPosition.x + platformWidth);
+	bounds.bottom = (LONG)(platformPosition.y + platformHeight);
+}
+
 void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 {
 	float changedX = object->GetVelocity().x * gameTime + object->GetPrev()->spriteWidth / 2 - object->GetSprite()->spriteWidth / 2;
 	float changedY = object->GetVelocity().y * gameTime + object->GetPrev()->spriteHeight / 2 - object->GetSprite()->spriteHeight / 2;
 
-	if (object->GetJumpDown() && object->GetPosition().y + object->GetSprite()->spriteHeight - changedY - 2 < platformPosition.y) {
+	if (object->GetJumpDown() && object->GetPosition().y + object->GetSprite()->spriteHeight - changedY - 2 < platformPosition.y) { // object is above platform
 		object->ignore.insert(this);
 		object->SetJumpDown(false);
 		object->SetPositionY(object->GetPosition().y + 1);
@@ -32,9 +43,11 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 		//return;
 	}
 
-	if (object->ignore.find(this) == object->ignore.end() && /*!object->GetJumpDown() && */ object->GetPosition().y + object->GetSprite()->spriteHeight - changedY - 2 < platformPosition.y)
+	if (object->ignore.find(this) == object->ignore.end() && /*!object->GetJumpDown() && */ object->GetPosition().y + object->GetSprite()->spriteHeight - changedY - 2 < platformPosition.y) // object i
 	{
+
 		object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight + 1);
+		object->SetVelocityX(object->GetVelocity().x + this->velocity.x);
 		object->SetVelocityY(0);
 		object->SetJumpVelocity(0);
 		object->ResetJumpCount();
@@ -57,6 +70,7 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 			if (!fallThrough)
 			{
 				object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight + 1);
+				object->SetVelocityX(object->GetVelocity().x + this->velocity.x);
 				object->SetVelocityY(0);
 				object->SetJumpVelocity(0);
 				object->ResetJumpCount();
