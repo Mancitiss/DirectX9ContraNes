@@ -333,7 +333,13 @@ void Player::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 	// if the F key is pressed, fire a bullet
 	if (SHOOT & 0x8000)
 	{
+		if (this->reloadTime <= 0) 
+		{
+			this->reloadTime = this->reloadDelay;
+			this->fired = true;
+		}
 	}
+	
 }
 
 void Player::HandleInput(float gameTime)
@@ -447,6 +453,9 @@ void Player::Update(float gameTime)
 	//{
 	if (this->invincibilityTime > 0) {
 		this->invincibilityTime -= gameTime;
+	}
+	if (this->reloadTime > 0) {
+		this->reloadTime -= gameTime;
 	}
 
 	position.x += velocity.x * gameTime;

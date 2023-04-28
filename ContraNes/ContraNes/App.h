@@ -7,6 +7,7 @@
 #include "StandableObject.h"
 #include <vector>
 #include "Monster.h"
+#include "Bullet.h"
 
 class App : public ContraApp
 {
@@ -36,6 +37,8 @@ private:
 
 	std::vector<StandableObject*> platforms;
 	std::vector<Monster*> monsters;
+	std::vector<Bullet*> playerBullets;
+	std::vector<Bullet*> monsterBullets;
 
 	GameTime* gameTime;
 	ID3DXFont* font;

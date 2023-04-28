@@ -20,9 +20,9 @@ public:
 
 	D3DXVECTOR3 GetVelocity() const override;
 
-	D3DXVECTOR3 GetDirection() const override;
+	D3DXVECTOR3 GetDirection() const override; // aim direction
 
-	D3DXVECTOR3 GetMovementVector() const override;
+	D3DXVECTOR3 GetMovementVector() const override; // movement direction
 
 	virtual GameSprite* GetPrev() const override;
 
@@ -77,11 +77,14 @@ public:
 	float GetInvincibilityDelay() const;
 
 	bool respawn = false;
+	bool fired = false;
+
+	Facing GetFacing() { return this->facing; }
 
 protected:
 	virtual void _defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction);
 
-	int health = 3; // TODO: implement health system
+	int health = 3;
 	int damage = 1;
 
 	float invincibilityTime = 0.0f;
@@ -89,6 +92,9 @@ protected:
 
 	float frameTime;
 	float frameDelay;
+
+	float reloadTime = 0.0f;
+	float reloadDelay = 0.5f;
 
 	Waterlogged waterlogged;
 	bool lockXFacing, lockYFacing;

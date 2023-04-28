@@ -1,6 +1,7 @@
 #include "Bullet.h";
+#include "d3dUtil.h"
 
-Bullet::Bullet(float x, float y, float width, float height, float rotation, float speed, float maxSpeed) : GameplayObject(x, y, rotation, speed, maxSpeed)
+Bullet::Bullet(float x, float y, float rotation, float speed, float maxSpeed, float width, float height,  D3DXVECTOR3 internalScale) : GameplayObject(x, y, rotation, speed, maxSpeed, internalScale)
 {
 	this->width = width;
 	this->height = height;
@@ -9,21 +10,76 @@ Bullet::Bullet(float x, float y, float width, float height, float rotation, floa
 
 Bullet::~Bullet()
 {
+	GameSprite* pSprite = pDying;
+	while (pSprite)
+	{
+		GameSprite* pNext = nullptr;
+		if (pSprite->pNext != pSprite) pNext = pSprite->pNext;
+		delete pSprite;
+		pSprite = pNext;
+	}
 }
 
-void Bullet::Init(PDIRECT3DDEVICE9 device, LPCTSTR file, D3DCOLOR backColor, D3DCOLOR displayColor)
+bool Bullet::Init(PDIRECT3DDEVICE9 device, float frameDelay, LPCTSTR file, D3DCOLOR backColor, D3DCOLOR displayColor)
 {
-	GameplayObject::Init(device, file, this->width, this->height, this->rotation, backColor, displayColor);
+	if (!GameplayObject::Init(device, file, this->width, this->height, this->rotation, backColor, displayColor)) return false;
+
+	if (!this->pDying)
+	{
+		if (!CreateSprites(device, 5, "resources/bullet", ".png", this->pDying, this->pDying, this->internalScale, 0))
+		{
+			return false;
+		}
+	}
+	GameSprite* pSprite = this->pDying;
+	while (pSprite->pNext != pDying)
+	{
+		pSprite = pSprite->pNext;
+	}
+	pSprite->pNext = pSprite;
+	pSprite->pDefault = pSprite;
+
+	this->sprite->pNext = this->sprite;
+	this->sprite->pDefault = this->sprite;
+
+
+	this->frameDelay = frameDelay;
+	this->frameTime = frameDelay;
+
+	this->status = ObjectStatus::ACTIVE;
+	return true;
 }
 
-void Bullet::ApplyCollision(Player* const& object, float gameTime)
+void Bullet::ApplyCollision(Player* const& object)
 {
 	object->TakeDamage(this->GetDamage());
 	this->status = ObjectStatus::DYING;
+	this->sprite->pNext = this->pDying;
 }
 
 void Bullet::Update(float gameTime)
 {
-	GameplayObject::Update(gameTime);
-	this->bounds = { (LONG)position.x, (LONG)position.y, (LONG)(position.x + width), (LONG)(position.y + height) };
+	if (this->status == ObjectStatus::ACTIVE) 
+	{
+		GameplayObject::Update(gameTime);
+		this->bounds = { (LONG)position.x, (LONG)position.y, (LONG)(position.x + width), (LONG)(position.y + height) };
+	}
+	else if (this->status == ObjectStatus::DYING)
+	{
+		if (this->frameTime <= 0)
+		{
+			this->frameTime = this->frameDelay;
+		}
+		else
+		{
+			this->frameTime -= gameTime;
+			return;
+		}
+		if (this->sprite->pNext == this->sprite) {
+			this->status = ObjectStatus::DEAD;
+		}
+		else {
+			this->sprite = this->sprite->pNext;
+		}
+	}
 }

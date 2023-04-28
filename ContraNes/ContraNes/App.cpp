@@ -4,7 +4,6 @@
 #include "Keyboard.h"
 #include "App.h"
 #include "d3dUtil.h"
-#include "Player.h"
 #include "Runner.h"
 
 App::App(HINSTANCE hInstance) : ContraApp(hInstance)
@@ -19,6 +18,11 @@ App::~App()
 	{
 		delete player;
 		player = nullptr;
+	}
+	if (player2)
+	{
+		delete player2;
+		player2 = nullptr;
 	}
 	if (background)
 	{
@@ -40,6 +44,39 @@ App::~App()
 		font->Release();
 		font = nullptr;
 	}
+	for (auto& platform : platforms)
+	{
+		if (platform)
+		{
+			delete platform;
+			platform = nullptr;
+		}
+	}
+	for (auto& monster : monsters)
+	{
+		if (monster)
+		{
+			delete monster;
+			monster = nullptr;
+		}
+	}
+	for (auto& bullet : playerBullets)
+	{
+		if (bullet)
+		{
+			delete bullet;
+			bullet = nullptr;
+		}
+	}
+	for (auto& bullet : monsterBullets)
+	{
+		if (bullet)
+		{
+			delete bullet;
+			bullet = nullptr;
+		}
+	}
+
 }
 
 int App::Run()
@@ -52,6 +89,8 @@ int App::Run()
 		{
 			switch (msg.message)
 			{
+			case WM_QUIT:
+				return static_cast<int>(msg.wParam);
 			default:
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -183,6 +222,45 @@ void App::Update(float gameTime)
 	{
 		player->HandleInput(gameTime);
 		player->Update(gameTime);
+
+		if (player->fired)
+		{
+			player->fired = false;
+			// determine direction
+			if (player->GetDirection().x == 0.0f && player->GetDirection().y == 0.0f)
+			{
+				// facing
+				if (player->GetFacing() == Facing::RIGHT)
+				{
+// right
+					playerBullets.push_back(new Bullet(player->GetPosition().x + player->GetSprite()->spriteWidth, player->GetPosition().y + player->GetSprite()->spriteHeight / 2));
+					playerBullets[playerBullets.size() - 1]->Init(m_pDevice3D);
+				}
+				else
+				{
+					// left
+					playerBullets.push_back(new Bullet(player->GetPosition().x, player->GetPosition().y + player->GetSprite()->spriteHeight / 2, D3DXToRadian(180) ));
+					playerBullets[playerBullets.size() - 1]->Init(m_pDevice3D);
+				}
+			}
+			else
+			{
+				// moving
+				if (player->GetDirection().x > 0.0f)
+				{
+					// right
+					playerBullets.push_back(new Bullet(player->GetPosition().x + player->GetSprite()->spriteWidth, player->GetPosition().y + player->GetSprite()->spriteHeight / 2));
+					playerBullets[playerBullets.size() - 1]->Init(m_pDevice3D);
+				}
+				else
+				{
+					// left
+					playerBullets.push_back(new Bullet(player->GetPosition().x, player->GetPosition().y + player->GetSprite()->spriteHeight / 2, D3DXToRadian(180)));
+					playerBullets[playerBullets.size() - 1]->Init(m_pDevice3D);
+				}
+			}
+		}
+
 		if (player->respawn)
 		{
 			// find direction of the map 
@@ -267,6 +345,12 @@ void App::Update(float gameTime)
 		}
 	}
 
+	for (auto& bullet : playerBullets)
+	{
+		if (!bullet || !bullet->IsInitialized()) continue;
+		bullet->Update(gameTime);
+	}
+
 	if (camera) {
 
 		if (GetAsyncKeyState(70)) // F
@@ -296,7 +380,7 @@ void App::Update(float gameTime)
 				{
 					monster->SetMoveType(MoveType::LEFT);
 				}
-				else if (monster->GetMoveType() != MoveType::NONE)
+				else if (monster->GetMoveType() != MoveType::NONE || monster->GetStatus() == ObjectStatus::DEAD )
 				{
 					// delete monster and remove it from the vector
 					monsters.erase(std::remove(monsters.begin(), monsters.end(), monster), monsters.end());
@@ -312,13 +396,44 @@ void App::Update(float gameTime)
 				}
 			}
 		}
+
+		for (auto& bullet : playerBullets)
+		{
+			if (!bullet || !bullet->IsInitialized()) continue;
+			RECT bulletRect = bullet->GetBounds();
+			if (!CheckIntersection(&bulletRect, &cam) || bullet->GetStatus() == ObjectStatus::DEAD )
+			{
+				// delete bullet and remove it from the vector
+				playerBullets.erase(std::remove(playerBullets.begin(), playerBullets.end(), bullet), playerBullets.end());
+				bullet = NULL;
+				// log
+				//OutputDebugString(L"Bullet deleted\n");
+			}
+			else
+			{
+				for (auto& monster : monsters)
+				{
+					if (!monster || !monster->IsInitialized()) continue;
+					RECT monsterRect = { (LONG)monster->GetPosition().x, (LONG)monster->GetPosition().y, (LONG)(monster->GetPosition().x + monster->GetSprite()->spriteWidth), (LONG)(monster->GetPosition().y + monster->GetSprite()->spriteHeight) };
+					if (!CheckIntersection(&bulletRect, &monsterRect)) continue;
+					bullet->ApplyCollision(monster);
+					break;
+				}
+			}
+		}
 	}
 
-	if (player->GetPosition().y > 10000) { 
+	if (player->GetPosition().y > 10000) 
+	{ 
 		// reset player position if they fall off the map somehow
 		// we will do the same for other objects later
 		// but instead of resetting their position, we will just destroy them
 		player->SetPositionY(0);
+	}
+
+	if (player->GetPosition().x < 0) 
+	{
+		player->SetPositionX(0);
 	}
 
 	//OutputDebugString(ConvertToLPCWSTR("Camera position: " + std::to_string(camera->GetBounds().left) + " " + std::to_string(camera->GetBounds().top) + "\n"));
@@ -354,7 +469,21 @@ void App::Render(float gameTime)
 		{
 			for (auto& monster : monsters)
 			{
-				camera->Render(monster);
+				if (monster && monster->IsInitialized()) 
+				{
+					camera->Render(monster);
+				}
+			}
+		}
+
+		if (playerBullets.size() > 0)
+		{
+			for (auto& bullet : playerBullets)
+			{
+				if (bullet && bullet->IsInitialized())
+				{
+					camera->Render(bullet);
+				}
 			}
 		}
 	}
@@ -368,6 +497,7 @@ void App::Render(float gameTime)
 			+ "\n" + "Camera Top Left: " + std::to_string(camera->GetBounds().left) + " " + std::to_string(camera->GetBounds().top) 
 			+ "\n" + "Camera Bottom Right: " + std::to_string(camera->GetBounds().right) + " " + std::to_string(camera->GetBounds().bottom)
 			+ "\n" + "Player health: " + std::to_string(player->GetHealth())
+			+ "\n" + "FPS: " + std::to_string(1 / gameTime)
 		);
 		font->DrawTextW(NULL, message, -1, &messageRect, DT_LEFT, D3DCOLOR_ARGB(255, 255, 255, 0));
 	}

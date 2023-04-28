@@ -40,8 +40,15 @@ Runner::~Runner()
 {
 	this->target = nullptr;
 
-	DeleteCircularList(this->pIdleRight);
-	DeleteCircularList(this->pIdleLeft);
+	if (this->pIdleRight) {
+		delete this->pIdleRight;
+		this->pIdleRight = nullptr;
+	}
+
+	if (this->pIdleLeft) {
+		delete this->pIdleLeft;
+		this->pIdleLeft = nullptr;
+	}
 
 	DeleteCircularList(this->pMoveRight);
 	DeleteCircularList(this->pMoveLeft);
