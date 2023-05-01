@@ -40,8 +40,15 @@ Runner::~Runner()
 {
 	this->target = nullptr;
 
-	DeleteCircularList(this->pIdleRight);
-	DeleteCircularList(this->pIdleLeft);
+	if (this->pIdleRight) {
+		delete this->pIdleRight;
+		this->pIdleRight = nullptr;
+	}
+
+	if (this->pIdleLeft) {
+		delete this->pIdleLeft;
+		this->pIdleLeft = nullptr;
+	}
 
 	DeleteCircularList(this->pMoveRight);
 	DeleteCircularList(this->pMoveLeft);
@@ -97,6 +104,10 @@ bool Runner::Init(LPDIRECT3DDEVICE9 device, float frameDelay)
 	this->frameTime = frameDelay;
 
 	this->initialized = true;
+
+	this->health = 1;
+	this->damage = 1;
+
 	return true;
 }
 
