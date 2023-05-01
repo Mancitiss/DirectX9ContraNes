@@ -23,6 +23,7 @@ public:
 	virtual void Draw(D3DXVECTOR3* position, D3DXVECTOR3* scaleFactors, float dt);
 
 	ObjectStatus GetStatus() const;
+	void SetStatus(ObjectStatus status) { this->status = status; }
 	GameSprite* GetSprite() const;
 
 	void SetSpeed(float speed);

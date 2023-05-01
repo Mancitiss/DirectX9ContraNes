@@ -52,30 +52,10 @@ App::~App()
 			platform = nullptr;
 		}
 	}
-	for (auto& monster : monsters)
-	{
-		if (monster)
-		{
-			delete monster;
-			monster = nullptr;
-		}
-	}
-	for (auto& bullet : playerBullets)
-	{
-		if (bullet)
-		{
-			delete bullet;
-			bullet = nullptr;
-		}
-	}
-	for (auto& bullet : monsterBullets)
-	{
-		if (bullet)
-		{
-			delete bullet;
-			bullet = nullptr;
-		}
-	}
+
+	monsters.clear();
+	playerBullets.clear();
+	monsterBullets.clear();
 
 }
 
@@ -108,19 +88,63 @@ int App::Run()
 
 void App::_Run() 
 {
-	static constexpr float kTargetFrameTime = 1.0f / 60.0f; // 60 FPS
-	static float sAccumulatedTime = 0.0f;
+	//static constexpr float kTargetFrameTime = 1.0f / 60.0f; // 60 FPS
+	//static float sAccumulatedTime = 0.0f;
+
+	//gameTime->Update();
+
+	//sAccumulatedTime += gameTime->elapsedGameTime;
+	//while ( sAccumulatedTime >= kTargetFrameTime )
+	//{
+	//	Update(kTargetFrameTime);
+	//	Render(kTargetFrameTime);
+
+	//	sAccumulatedTime -= kTargetFrameTime;
+	//}
+
+
+	// max fps
+	//static constexpr float kMaxFrameTime = 1.0f / 60.0f; // 60 FPS
+
+	//gameTime->Update();
+
+	//float deltaTime = gameTime->elapsedGameTime;
+	//if (deltaTime < kMaxFrameTime)
+	//{
+	//	// Sleep the thread if the elapsed time is less than the maximum frame time
+	//	const DWORD sleepTime = static_cast<DWORD>((kMaxFrameTime - deltaTime) * 1000.0f);
+	//	Sleep(sleepTime);
+	//}
+	//if (deltaTime > 0.15f) deltaTime = 0.0f;
+	//Update(deltaTime);
+	//Render(deltaTime);
+
+
+	// max fps without sleep
+	static constexpr float kMaxFrameTime = 1.0f / 60.0f; // max FPS
 
 	gameTime->Update();
 
-	sAccumulatedTime += gameTime->elapsedGameTime;
-	while ( sAccumulatedTime >= kTargetFrameTime )
+	const float deltaTime = gameTime->elapsedGameTime;
+	if (deltaTime < kMaxFrameTime)
 	{
-		Update(kTargetFrameTime);
-		Render(kTargetFrameTime);
+		// Calculate the time to wait
+		const DWORD waitTime = static_cast<DWORD>((kMaxFrameTime - deltaTime) * 1000.0f);
 
-		sAccumulatedTime -= kTargetFrameTime;
+		// Create and set the timer
+		HANDLE hTimer = CreateWaitableTimer(NULL, FALSE, NULL);
+		LARGE_INTEGER dueTime;
+		dueTime.QuadPart = -static_cast<LONGLONG>(waitTime) * 10000LL;
+		SetWaitableTimer(hTimer, &dueTime, 0, NULL, NULL, FALSE);
+
+		// Wait for the timer to expire
+		WaitForSingleObject(hTimer, INFINITE);
+		CloseHandle(hTimer);
 	}
+	if (deltaTime > 0.25f) return; // pause the game when the game is stopped / or below 4 fps (0.25s)
+	Update(deltaTime);
+	Render(deltaTime);
+	
 }
 
 ID3DXSprite* pSprite;
@@ -144,8 +168,8 @@ bool App::InitObjects()
 	platforms.push_back(new StandableObject(3130, 270, 400, 80, true));
 	platforms.push_back(new StandableObject(3390, 390, 360, 30, true)); // 15
 
-	monsters.push_back(new Runner(1450, 140, 0, 100, 100));
-	monsters[0]->Init(m_pDevice3D, 0.15f);
+	monsters.emplace_back(std::make_unique<Runner>(1450, 140, 0, 200, 200));
+	monsters.back()->Init(m_pDevice3D, 0.15f);
 
 
 	background = new GameplayObject(0, 0, 1.0f, 0, 0, 0);
@@ -227,20 +251,20 @@ void App::Update(float gameTime)
 		{
 			player->fired = false;
 			// determine direction
-			if (player->GetDirection().x == 0.0f && player->GetDirection().y == 0.0f)
+			if (player->GetDirection().x == 0.0f && player->GetDirection().y >= 0.0f)
 			{
 				// facing
 				if (player->GetFacing() == Facing::RIGHT)
 				{
 // right
-					playerBullets.push_back(new Bullet(player->GetPosition().x + player->GetSprite()->spriteWidth, player->GetPosition().y + player->GetSprite()->spriteHeight / 2));
-					playerBullets[playerBullets.size() - 1]->Init(m_pDevice3D);
+					playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x + player->GetSprite()->spriteWidth, player->GetPosition().y + player->GetSprite()->spriteHeight / 4));
+					playerBullets.back()->Init(m_pDevice3D);
 				}
 				else
 				{
 					// left
-					playerBullets.push_back(new Bullet(player->GetPosition().x, player->GetPosition().y + player->GetSprite()->spriteHeight / 2, D3DXToRadian(180) ));
-					playerBullets[playerBullets.size() - 1]->Init(m_pDevice3D);
+					playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x, player->GetPosition().y + player->GetSprite()->spriteHeight / 4, D3DXToRadian(180) ));
+					playerBullets.back()->Init(m_pDevice3D);
 				}
 			}
 			else
@@ -248,15 +272,54 @@ void App::Update(float gameTime)
 				// moving
 				if (player->GetDirection().x > 0.0f)
 				{
-					// right
-					playerBullets.push_back(new Bullet(player->GetPosition().x + player->GetSprite()->spriteWidth, player->GetPosition().y + player->GetSprite()->spriteHeight / 2));
-					playerBullets[playerBullets.size() - 1]->Init(m_pDevice3D);
+					if (player->GetDirection().y == 0.0f) 
+					{
+						// right
+						playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x + player->GetSprite()->spriteWidth, player->GetPosition().y + player->GetSprite()->spriteHeight / 4));
+						playerBullets.back()->Init(m_pDevice3D);
+					}
+					else if (player->GetDirection().y > 0.0f) 
+					{
+						// bottom right
+						playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x + player->GetSprite()->spriteWidth, player->GetPosition().y + player->GetSprite()->spriteWidth * 3/4, D3DXToRadian(30)));
+						playerBullets.back()->Init(m_pDevice3D);
+					}
+					else
+					{
+						// top right
+						playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x + player->GetSprite()->spriteWidth * 3 / 4, player->GetPosition().y, D3DXToRadian(-30)));
+						playerBullets.back()->Init(m_pDevice3D);
+					}
+				}
+				else if (player->GetDirection().x < 0.0f)
+				{
+					if (player->GetDirection().y == 0.0f)
+					{
+						// left
+						playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x, player->GetPosition().y + player->GetSprite()->spriteHeight / 4, D3DXToRadian(180)));
+						playerBullets.back()->Init(m_pDevice3D);
+					}
+					else if (player->GetDirection().y > 0.0f)
+					{
+						// bottom left
+						playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x, player->GetPosition().y + player->GetSprite()->spriteWidth * 3 / 4, D3DXToRadian(150)));
+						playerBullets.back()->Init(m_pDevice3D);
+					}
+					else
+					{
+						// top left
+						playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x + player->GetSprite()->spriteWidth * 1 / 4, player->GetPosition().y, D3DXToRadian(-150)));
+						playerBullets.back()->Init(m_pDevice3D);
+					}
 				}
 				else
 				{
-					// left
-					playerBullets.push_back(new Bullet(player->GetPosition().x, player->GetPosition().y + player->GetSprite()->spriteHeight / 2, D3DXToRadian(180)));
-					playerBullets[playerBullets.size() - 1]->Init(m_pDevice3D);
+					if (player->GetDirection().y < 0.0f)
+					{
+						// top
+						playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x + player->GetSprite()->spriteWidth / 2, player->GetPosition().y, D3DXToRadian(-90)));
+						playerBullets.back()->Init(m_pDevice3D);
+					}
 				}
 			}
 		}
@@ -339,7 +402,7 @@ void App::Update(float gameTime)
 			RECT platformRect = platform->GetBounds();
 			if (CheckIntersection(&monsterRect, &platformRect))
 			{
-				platform->ApplyCollision(monster, gameTime);
+				platform->ApplyCollision(&*monster, gameTime);
 				break;
 			}
 		}
@@ -353,7 +416,7 @@ void App::Update(float gameTime)
 
 	if (camera) {
 
-		if (GetAsyncKeyState(70)) // F
+		if (GetAsyncKeyState(69)) // E
 		{
 			if (!camera->IsFollowing()) 
 			{
@@ -371,23 +434,19 @@ void App::Update(float gameTime)
 		RECT cam = camera->GetBounds();
 		for (auto& monster : monsters)
 		{
-			if (monster && monster->IsInitialized())
+			if (monster && monster->IsInitialized() && monster->GetStatus() == ObjectStatus::ACTIVE)
 			{
 				// log monster position
 				//OutputDebugString(ConvertToLPCWSTR("M: " + std::to_string(monster->GetPosition().x) + " " + std::to_string(monster->GetPosition().y) + ""));
 				RECT monsterRect = { (LONG)monster->GetPosition().x, (LONG)monster->GetPosition().y, (LONG)(monster->GetPosition().x + monster->GetSprite()->spriteWidth), (LONG)(monster->GetPosition().y + monster->GetSprite()->spriteHeight) };
-				if (CheckIntersection(&monsterRect, &cam))
+				if (CheckIntersection(&monsterRect, &cam) && monster->GetMoveType() == MoveType::NONE)
 				{
 					monster->SetMoveType(MoveType::LEFT);
 				}
-				else if (monster->GetMoveType() != MoveType::NONE || monster->GetStatus() == ObjectStatus::DEAD )
+				else if (!CheckIntersection(&monsterRect, &cam) && monster->GetMoveType() != MoveType::NONE)
 				{
-					// delete monster and remove it from the vector
-					monsters.erase(std::remove(monsters.begin(), monsters.end(), monster), monsters.end());
-					//delete monster; // don't have to delete it, it will be deleted by the vector
-					monster = NULL;
-					// log
-					//OutputDebugString(L"Monster deleted\n");
+					monster->SetStatus(ObjectStatus::DEAD);
+					continue;
 				}
 
 				if (CheckIntersection(&playerRect, &monsterRect))
@@ -396,6 +455,7 @@ void App::Update(float gameTime)
 				}
 			}
 		}
+		monsters.remove_if([](const std::unique_ptr<Monster>& monster) { return monster->GetStatus() == ObjectStatus::DEAD; });
 
 		for (auto& bullet : playerBullets)
 		{
@@ -403,11 +463,9 @@ void App::Update(float gameTime)
 			RECT bulletRect = bullet->GetBounds();
 			if (!CheckIntersection(&bulletRect, &cam) || bullet->GetStatus() == ObjectStatus::DEAD )
 			{
-				// delete bullet and remove it from the vector
-				playerBullets.erase(std::remove(playerBullets.begin(), playerBullets.end(), bullet), playerBullets.end());
-				bullet = NULL;
 				// log
 				//OutputDebugString(L"Bullet deleted\n");
+				bullet->SetStatus(ObjectStatus::DEAD);
 			}
 			else
 			{
@@ -416,11 +474,31 @@ void App::Update(float gameTime)
 					if (!monster || !monster->IsInitialized()) continue;
 					RECT monsterRect = { (LONG)monster->GetPosition().x, (LONG)monster->GetPosition().y, (LONG)(monster->GetPosition().x + monster->GetSprite()->spriteWidth), (LONG)(monster->GetPosition().y + monster->GetSprite()->spriteHeight) };
 					if (!CheckIntersection(&bulletRect, &monsterRect)) continue;
-					bullet->ApplyCollision(monster);
+					bullet->ApplyCollision(&*monster);
 					break;
 				}
 			}
 		}
+		playerBullets.remove_if([](const std::unique_ptr<Bullet>& bullet) { return bullet->GetStatus() == ObjectStatus::DEAD; });
+
+		for (auto& bullet : monsterBullets)
+		{
+			if (!bullet || !bullet->IsInitialized()) continue;
+			RECT bulletRect = bullet->GetBounds();
+			if (!CheckIntersection(&bulletRect, &cam) || bullet->GetStatus() == ObjectStatus::DEAD)
+			{
+				// log
+				//OutputDebugString(L"Bullet deleted\n");
+				bullet->SetStatus(ObjectStatus::DEAD);
+			}
+			else
+			{
+				RECT playerRect = { (LONG)player->GetPosition().x, (LONG)player->GetPosition().y, (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
+				if (!CheckIntersection(&bulletRect, &playerRect)) continue;
+				bullet->ApplyCollision(player);
+			}
+		}
+		monsterBullets.remove_if([](const std::unique_ptr<Bullet>& bullet) { return bullet->GetStatus() == ObjectStatus::DEAD; });
 	}
 
 	if (player->GetPosition().y > 10000) 
@@ -471,7 +549,7 @@ void App::Render(float gameTime)
 			{
 				if (monster && monster->IsInitialized()) 
 				{
-					camera->Render(monster);
+					camera->Render(&*monster);
 				}
 			}
 		}
@@ -482,7 +560,7 @@ void App::Render(float gameTime)
 			{
 				if (bullet && bullet->IsInitialized())
 				{
-					camera->Render(bullet);
+					camera->Render(&*bullet);
 				}
 			}
 		}

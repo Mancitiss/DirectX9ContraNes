@@ -18,11 +18,28 @@ Bullet::~Bullet()
 		delete pSprite;
 		pSprite = pNext;
 	}
+
+	if (pNormal)
+	{
+		delete pNormal;
+		pNormal = nullptr;
+	}
+
+	sprite = nullptr;
 }
 
 bool Bullet::Init(PDIRECT3DDEVICE9 device, float frameDelay, LPCTSTR file, D3DCOLOR backColor, D3DCOLOR displayColor)
 {
-	if (!GameplayObject::Init(device, file, this->width, this->height, this->rotation, backColor, displayColor)) return false;
+	if (!this->pNormal)
+	{
+		this->pNormal = new GameSprite();
+		if (!this->pNormal->Init(device, file, this->width, this->height, this->rotation, this->internalScale, backColor, displayColor))
+		{
+			return false;
+		}
+		this->pNormal->pNext = this->pNormal;
+		this->pNormal->pDefault = this->pNormal;
+	}
 
 	if (!this->pDying)
 	{
@@ -31,6 +48,7 @@ bool Bullet::Init(PDIRECT3DDEVICE9 device, float frameDelay, LPCTSTR file, D3DCO
 			return false;
 		}
 	}
+
 	GameSprite* pSprite = this->pDying;
 	while (pSprite->pNext != pDying)
 	{
@@ -39,12 +57,11 @@ bool Bullet::Init(PDIRECT3DDEVICE9 device, float frameDelay, LPCTSTR file, D3DCO
 	pSprite->pNext = pSprite;
 	pSprite->pDefault = pSprite;
 
-	this->sprite->pNext = this->sprite;
-	this->sprite->pDefault = this->sprite;
-
+	this->sprite = pNormal;
 
 	this->frameDelay = frameDelay;
 	this->frameTime = frameDelay;
+	this->initialized = true;
 
 	this->status = ObjectStatus::ACTIVE;
 	return true;

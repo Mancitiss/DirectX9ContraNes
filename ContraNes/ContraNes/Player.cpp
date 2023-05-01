@@ -295,7 +295,7 @@ void Player::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 	}
 	else if (JUMP) 
 	{
-		if (!hasJumped && jumpCount > 0 && ((JUMP & 0x8001) == 0x8001))
+		if (!hasJumped && jumpCount > 0 && ((JUMP & 0x8001) == 0x8001) && velocity.y == 0)
 		{
 			//OutputDebugString(L"Jumping\n");
 			hasJumped = true;
