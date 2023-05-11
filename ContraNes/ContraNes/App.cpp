@@ -5,6 +5,7 @@
 #include "App.h"
 #include "d3dUtil.h"
 #include "Runner.h"
+#include "Shooter.h"
 
 App::App(HINSTANCE hInstance) : ContraApp(hInstance)
 {
@@ -167,8 +168,46 @@ bool App::InitObjects()
 	platforms.push_back(new StandableObject(2950, 300, 120, 90, true));
 	platforms.push_back(new StandableObject(3130, 270, 400, 80, true));
 	platforms.push_back(new StandableObject(3390, 390, 360, 30, true)); // 15
+	platforms.push_back(new StandableObject(3680, 200, 390, 50, true));
+	platforms.push_back(new StandableObject(3760, 330, 120, 50, true));
+	platforms.push_back(new StandableObject(3950, 330, 120, 50, true));
+	platforms.push_back(new StandableObject(4010, 140, 310, 50, true));
+	platforms.push_back(new StandableObject(4130, 300, 70, 50, true)); // 20
+	platforms.push_back(new StandableObject(4260, 270, 190, 50, true));
+	platforms.push_back(new StandableObject(4380, 210, 120, 50, true));
+	platforms.push_back(new StandableObject(4580, 270, 120, 50, true));
+	platforms.push_back(new StandableObject(4640, 210, 120, 50, true));
+	platforms.push_back(new StandableObject(4830, 270, 120, 50, true)); // 25
+	platforms.push_back(new StandableObject(4830, 390, 60, 50, true));
+	platforms.push_back(new StandableObject(4890, 330, 180, 50, true));
+	platforms.push_back(new StandableObject(5070, 210, 110, 50, true));
+	platforms.push_back(new StandableObject(5140, 390, 60, 50, true));
+	platforms.push_back(new StandableObject(5070, 140, 240, 50, true)); // 30
+	platforms.push_back(new StandableObject(5200, 300, 60, 50, true));
+	platforms.push_back(new StandableObject(5330, 210, 110, 50, true));
+	platforms.push_back(new StandableObject(5390, 270, 310, 50, true));
+	platforms.push_back(new StandableObject(5570, 390, 190, 50, true));
+	platforms.push_back(new StandableObject(5820, 330, 130, 50, true)); // 35
+	platforms.push_back(new StandableObject(6020, 270, 120, 50, true)); 
+	platforms.push_back(new StandableObject(6140, 210, 250, 50, true));
+	platforms.push_back(new StandableObject(6140, 390, 480, 50, true));
+	platforms.push_back(new StandableObject(6210, 300, 180, 50, true));
+	platforms.push_back(new StandableObject(6390, 270, 70, 50, true)); // 40
+	platforms.push_back(new StandableObject(6460, 330, 70, 50, true)); 
+	platforms.push_back(new StandableObject(6550, 70, 220 , 370, false, false)); // door
 
-	monsters.emplace_back(std::make_unique<Runner>(1450, 140, 0, 200, 200));
+	monsters.emplace_back(std::make_unique<Runner>(1450.0f, 140.0f, 0.0f, 200.0f, 200.0f));
+	monsters.back()->Init(m_pDevice3D, 0.15f);
+
+	monsters.emplace_back(std::make_unique<Shooter>(1000.0f, 140.0f, 0.0f, 0.0f, 0.0f));
+	monsters.back()->Init(m_pDevice3D, 0.15f);
+	monsters.emplace_back(std::make_unique<Shooter>(900.0f, 140.0f, 0.0f, 0.0f, 0.0f));
+	monsters.back()->Init(m_pDevice3D, 0.15f);
+	monsters.emplace_back(std::make_unique<Shooter>(1100.0f, 140.0f, 0.0f, 0.0f, 0.0f));
+	monsters.back()->Init(m_pDevice3D, 0.15f);
+	monsters.emplace_back(std::make_unique<Shooter>(1200.0f, 140.0f, 0.0f, 0.0f, 0.0f));
+	monsters.back()->Init(m_pDevice3D, 0.15f);
+	monsters.emplace_back(std::make_unique<Shooter>(1300.0f, 140.0f, 0.0f, 0.0f, 0.0f));
 	monsters.back()->Init(m_pDevice3D, 0.15f);
 
 
@@ -406,9 +445,23 @@ void App::Update(float gameTime)
 				break;
 			}
 		}
+
+		if (monster->fired)
+		{
+			monster->fired = false;
+			monsterBullets.emplace_back(std::make_unique<Bullet>(monster->GetPosition().x + monster->GetSprite()->spriteWidth / 2, monster->GetPosition().y, monster->GetDirection().z));
+			monsterBullets.back()->Init(m_pDevice3D);
+		}
+
 	}
 
 	for (auto& bullet : playerBullets)
+	{
+		if (!bullet || !bullet->IsInitialized()) continue;
+		bullet->Update(gameTime);
+	}
+
+	for (auto& bullet : monsterBullets)
 	{
 		if (!bullet || !bullet->IsInitialized()) continue;
 		bullet->Update(gameTime);
@@ -442,8 +495,10 @@ void App::Update(float gameTime)
 				if (CheckIntersection(&monsterRect, &cam) && monster->GetMoveType() == MoveType::NONE)
 				{
 					monster->SetMoveType(MoveType::LEFT);
+					monster->target = player;
 				}
-				else if (!CheckIntersection(&monsterRect, &cam) && monster->GetMoveType() != MoveType::NONE)
+				//else if (!CheckIntersection(&monsterRect, &cam) && monster->GetMoveType() != MoveType::NONE)
+				else if ((monster->GetPosition().x + monster->GetSprite()->spriteWidth < cam.left - (cam.right - cam.left) || monster->GetPosition().y > cam.bottom) && monster->GetMoveType() != MoveType::NONE)
 				{
 					monster->SetStatus(ObjectStatus::DEAD);
 					continue;
@@ -557,6 +612,17 @@ void App::Render(float gameTime)
 		if (playerBullets.size() > 0)
 		{
 			for (auto& bullet : playerBullets)
+			{
+				if (bullet && bullet->IsInitialized())
+				{
+					camera->Render(&*bullet);
+				}
+			}
+		}
+
+		if (monsterBullets.size() > 0)
+		{
+			for (auto& bullet : monsterBullets)
 			{
 				if (bullet && bullet->IsInitialized())
 				{

@@ -43,7 +43,9 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 		//return;
 	}
 
-	if (object->ignore.find(this) == object->ignore.end() && /*!object->GetJumpDown() && */ object->GetPosition().y + object->GetSprite()->spriteHeight - changedY - 2 < platformPosition.y) // object i
+	bool ignore = !(object->ignore.find(this) == object->ignore.end());
+
+	if (!ignore && /*!object->GetJumpDown() && */ object->GetPosition().y + object->GetSprite()->spriteHeight - changedY - 2 < platformPosition.y) // object i
 	{
 
 		object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight + 1);
@@ -59,9 +61,23 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 	{
 		if (object->GetVelocity().y <= 0) {
 			if (!jumpThrough) {
-				object->SetPositionY(platformPosition.y + platformHeight);
-				object->SetVelocityY(0);
-				object->SetJumpVelocity(0);
+				if (!ignore && object->GetPosition().x - changedX > platformPosition.x + platformWidth)
+				{
+					object->SetPositionX(platformPosition.x + platformWidth);
+					object->SetVelocityX(0);
+
+				}
+				else if (!ignore && object->GetPosition().x - changedX < platformPosition.x)
+				{
+					object->SetPositionX(platformPosition.x - object->GetSprite()->spriteWidth);
+					object->SetVelocityX(0);
+				}
+				else 
+				{
+					object->SetPositionY(platformPosition.y + platformHeight);
+					object->SetVelocityY(0);
+					object->SetJumpVelocity(0);
+				}
 			}
 		}
 		else { // velocity.y > 0
@@ -69,24 +85,27 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 			//object->SetJumpDown(false);
 			if (!fallThrough)
 			{
-				object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight + 1);
-				object->SetVelocityX(object->GetVelocity().x + this->velocity.x);
-				object->SetVelocityY(0);
-				object->SetJumpVelocity(0);
-				object->ResetJumpCount();
-				object->SetJumpDown(false);
+				if (!ignore && object->GetPosition().x - changedX > platformPosition.x + platformWidth)
+				{
+					object->SetPositionX(platformPosition.x + platformWidth);
+					object->SetVelocityX(0);
+
+				}
+				else if (!ignore && object->GetPosition().x - changedX < platformPosition.x)
+				{
+					object->SetPositionX(platformPosition.x - object->GetSprite()->spriteWidth);
+					object->SetVelocityX(0);
+				}
+				else 
+				{
+					object->SetPositionY(platformPosition.y - object->GetSprite()->spriteHeight + 1);
+					object->SetVelocityX(object->GetVelocity().x + this->velocity.x);
+					object->SetVelocityY(0);
+					object->SetJumpVelocity(0);
+					object->ResetJumpCount();
+					object->SetJumpDown(false);
+				}
 			}
 		}
 	}
-	/*if (object->GetPosition().x - changedX > platformPosition.x + platformWidth)
-	{
-		object->SetPositionX(platformPosition.x + platformWidth + 10);
-		object->SetVelocityX(0);
-
-	}
-	else if (object->GetPosition().x - changedX < platformPosition.x)
-	{
-		object->SetPositionX(platformPosition.x - 30 - 10);
-		object->SetVelocityX(0);
-	}*/
 }

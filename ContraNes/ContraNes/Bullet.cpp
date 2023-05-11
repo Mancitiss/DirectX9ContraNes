@@ -1,4 +1,4 @@
-#include "Bullet.h";
+#include "Bullet.h"
 #include "d3dUtil.h"
 
 Bullet::Bullet(float x, float y, float rotation, float speed, float maxSpeed, float width, float height,  D3DXVECTOR3 internalScale) : GameplayObject(x, y, rotation, speed, maxSpeed, internalScale)

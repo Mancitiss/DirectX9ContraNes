@@ -18,9 +18,10 @@ public:
 
 	MoveType GetMoveType() const { return this->moveType; };
 
+	GameplayObject* target;
+
 protected:
 	MoveType moveType = MoveType::NONE;
-	GameplayObject* target;
 
 	float invincibilityDelay = 0;
 };

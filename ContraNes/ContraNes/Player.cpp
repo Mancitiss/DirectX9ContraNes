@@ -342,51 +342,14 @@ void Player::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 	
 }
 
-void Player::HandleInput(float gameTime)
+void Player::_HandleDirection(D3DXVECTOR3& directionVector)
 {
-
-	D3DXVECTOR3 movementVector(0, 0, 0);
-	D3DXVECTOR3 directionVector(0, 0, 0);
-	
-	_defaultHandle(movementVector, directionVector);
-
-	this->movementVector = movementVector;
-
-	/*if (movementVector.x != 0 || movementVector.y != 0)
-	{
-		rotation = atan2(movementVector.y, movementVector.x);
-	}*/
-	currentJerk = min(currentJerk + jerkIncrementPerSecond3 * gameTime, maxSpeed / (gameTime * gameTime));
-	currentAcceleration = min(currentAcceleration + currentJerk * gameTime, maxSpeed / gameTime);
-	currentVelocity = min(currentVelocity + currentAcceleration * gameTime, maxSpeed);
-	velocity.x = movementVector.x * currentVelocity;
-	//if (jumpCount < maxJump) {
-		if (movementVector.y >= 0 && jumpVelocity >= 0) jumpVelocity = - gravitationalAcceleration * gameTime;
-		velocity.y = - jumpVelocity;
-		jumpVelocity -= gravitationalAcceleration * gameTime;
-	//}
-	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gravitationalAcceleration) + " " + std::to_string(gameTime) + " " + std::to_string(jumpVelocity) + ", " + std::to_string(velocity.y) + ", " + std::to_string(0 + (jumpStatus == JumpStatus::JUMPING)) + "\n"));
-
-	this->prev = this->sprite;
-
-	if (status != ObjectStatus::ACTIVE) return;
-
-	if (this->frameTime <= 0)
-	{
-		this->frameTime = this->frameDelay;
-	}
-	else
-	{
-		this->frameTime -= gameTime;
-		return;
-	}
-
 	if (directionVector != currentDirection) {
 
 		if (directionVector.x > 0)
 		{
 			if (!lockXFacing) facing = Facing::RIGHT;
-			if (directionVector.y == 0) 
+			if (directionVector.y == 0)
 			{
 				this->sprite = this->pMoveRight;
 			}
@@ -439,11 +402,52 @@ void Player::HandleInput(float gameTime)
 
 		this->currentDirection = directionVector;
 	}
-	else 
+	else
 	{
 		this->sprite = this->sprite->pNext;
 	}
+}
 
+void Player::HandleInput(float gameTime)
+{
+
+	D3DXVECTOR3 movementVector(0, 0, 0);
+	D3DXVECTOR3 directionVector(0, 0, 0);
+	
+	_defaultHandle(movementVector, directionVector);
+
+	this->movementVector = movementVector;
+
+	/*if (movementVector.x != 0 || movementVector.y != 0)
+	{
+		rotation = atan2(movementVector.y, movementVector.x);
+	}*/
+	currentJerk = min(currentJerk + jerkIncrementPerSecond3 * gameTime, maxSpeed / (gameTime * gameTime));
+	currentAcceleration = min(currentAcceleration + currentJerk * gameTime, maxSpeed / gameTime);
+	currentVelocity = min(currentVelocity + currentAcceleration * gameTime, maxSpeed);
+	velocity.x = movementVector.x * currentVelocity;
+	//if (jumpCount < maxJump) {
+		if (movementVector.y >= 0 && jumpVelocity >= 0) jumpVelocity = - gravitationalAcceleration * gameTime;
+		velocity.y = - jumpVelocity;
+		jumpVelocity -= gravitationalAcceleration * gameTime;
+	//}
+	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gravitationalAcceleration) + " " + std::to_string(gameTime) + " " + std::to_string(jumpVelocity) + ", " + std::to_string(velocity.y) + ", " + std::to_string(0 + (jumpStatus == JumpStatus::JUMPING)) + "\n"));
+
+	this->prev = this->sprite;
+
+	if (status != ObjectStatus::ACTIVE) return;
+
+	if (this->frameTime <= 0)
+	{
+		this->frameTime = this->frameDelay;
+	}
+	else
+	{
+		this->frameTime -= gameTime;
+		return;
+	}
+
+	_HandleDirection(directionVector);
 
 }
 
@@ -488,7 +492,7 @@ void Player::Update(float gameTime)
 			this->frameTime -= gameTime;
 			return;
 		}
-		if (this->sprite->pNext == this->sprite && this->invincibilityTime <= 0) {
+		if (/*this->sprite->pNext == this->sprite && */this->invincibilityTime <= 0) {
 			this->status = ObjectStatus::DEAD;
 		}
 		else {
@@ -601,8 +605,8 @@ void Player::TakeDamage(int damage)
 		{
 			this->status = ObjectStatus::DYING;
 			this->invincibilityTime = 1;
-			if (facing == Facing::LEFT) this->sprite = this->pDieLeft;
-			else this->sprite = this->pDieRight;
+			if (facing == Facing::LEFT && pDieLeft) this->sprite = this->pDieLeft;
+			else if (pDieRight) this->sprite = this->pDieRight;
 		}
 	}
 }

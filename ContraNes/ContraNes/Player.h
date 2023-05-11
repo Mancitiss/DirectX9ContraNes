@@ -83,6 +83,7 @@ public:
 
 protected:
 	virtual void _defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction);
+	virtual void _HandleDirection(D3DXVECTOR3& direction);
 
 	int health = 3;
 	int damage = 1;

@@ -4,8 +4,6 @@
 void Runner::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 {
 	switch (this->moveType) {
-	case MoveType::NONE: 
-		break;
 	case MoveType::LEFT: 
 		movement.x = -1;
 		direction.x = -1;
@@ -33,27 +31,16 @@ void Runner::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 			movement.x = 1;
 			direction.x = 1;
 		}
+	case MoveType::NONE:
+	default:
+		break;
 	}
 }
 
 Runner::~Runner()
 {
-	this->target = nullptr;
-
-	if (this->pIdleRight) {
-		delete this->pIdleRight;
-		this->pIdleRight = nullptr;
-	}
-
-	if (this->pIdleLeft) {
-		delete this->pIdleLeft;
-		this->pIdleLeft = nullptr;
-	}
-
-	DeleteCircularList(this->pMoveRight);
-	DeleteCircularList(this->pMoveLeft);
-
 	this->sprite = nullptr;
+	this->prev = nullptr;
 }
 
 bool Runner::Init(LPDIRECT3DDEVICE9 device, float frameDelay)

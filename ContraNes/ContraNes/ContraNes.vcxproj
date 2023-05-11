@@ -149,6 +149,7 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Runner.cpp" />
+    <ClCompile Include="Shooter.cpp" />
     <ClCompile Include="StandableObject.cpp" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
@@ -166,6 +167,7 @@
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Runner.h" />
+    <ClInclude Include="Shooter.h" />
     <ClInclude Include="StandableObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
