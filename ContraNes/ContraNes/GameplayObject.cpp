@@ -7,6 +7,7 @@ GameplayObject::GameplayObject(float x, float y, float rotation, float speed, fl
 {
 	float two_pi = (float)(M_PI * 2.0f);
 	this->position = D3DXVECTOR3(x, y, 0);
+	this->prev_position = this->position;
 	this->rotation = (rotation > two_pi)? rotation - two_pi : rotation;
 	this->maxSpeed = maxSpeed;
 	if (0 <= speed && speed <= maxSpeed)
@@ -33,6 +34,7 @@ GameplayObject::GameplayObject(float x, float y, float z, float rotation, float 
 	// NOTE: because the y axis is inverted, the PI circle is actually go clockwise instead of counter clockwise
 	float two_pi = (float)(M_PI * 2.0f);
 	this->position = D3DXVECTOR3(x, y, z);
+	this->prev_position = this->position;
 	this->rotation = (rotation > two_pi) ? rotation - two_pi : rotation;
 	this->maxSpeed = maxSpeed;
 	if (0 <= speed && speed <= maxSpeed)

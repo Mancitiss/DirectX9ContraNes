@@ -1,6 +1,6 @@
 #include "GameSprite.h"
 #include "d3dUtil.h"
-#include <DxErr.h>
+//#include <DxErr.h>
 GameSprite::GameSprite()
 {
 	// when color is set to white, the sprite will be drawn with its original color
@@ -52,7 +52,7 @@ bool GameSprite::Init(LPDIRECT3DDEVICE9 device, LPCTSTR rss, int width, int heig
 		LPCWSTR errorText = L"Error loading texture: ";
 		wchar_t errorMsg[MAX_PATH];
 		wcscpy_s(errorMsg, MAX_PATH, errorText);
-		wcscat_s(errorMsg, MAX_PATH, DXGetErrorString(hr));
+		//wcscat_s(errorMsg, MAX_PATH, DXGetErrorString(hr));
 		wcscat_s(errorMsg, MAX_PATH, L" ");
 		wcscat_s(errorMsg, MAX_PATH, rss);
 		MessageBox(NULL, errorMsg, L"Error", MB_OK);

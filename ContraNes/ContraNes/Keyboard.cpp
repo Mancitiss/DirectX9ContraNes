@@ -1,12 +1,13 @@
 #include "Keyboard.h"
 #include <Windows.h>
+#include "CONSTANTS.h"
 
 int Keyboard::default_down = VK_DOWN;
 int Keyboard::default_up = VK_UP;
 int Keyboard::default_left = VK_LEFT;
 int Keyboard::default_right = VK_RIGHT;
 int Keyboard::default_jump = VK_SPACE;
-int Keyboard::default_shoot = 0x46; // F
+int Keyboard::default_shoot = VK_F;
 int Keyboard::default_select = VK_RETURN;
 int Keyboard::default_pause = VK_ESCAPE;
 

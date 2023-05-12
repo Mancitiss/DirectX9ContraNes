@@ -3,34 +3,35 @@
 #include "d3dUtil.h"
 #include "GameSprite.h"
 #include "d3dUtil.h"
+#include "CONSTANTS.H"
 
-Player::Player(float x, float y, D3DXVECTOR3 internalScale) : Character(x, y, 0, 0, 0, 300.0f, internalScale)
+Player::Player(float x, float y, D3DXVECTOR3 internalScale) : Character(x, y, 0, 0, 0, DEFAULT_SPEED, internalScale)
 {
-	gravitationalAcceleration = 2000;
+	gravitationalAcceleration = DEFAULT_GRAVITATIONAL_ACCELERATION;
 	jumpVelocity = 0;
 	facing = Facing::RIGHT;
 	lockYFacing = true;
-	maxJump = 1;
+	maxJump = DEFAULT_MAX_JUMP;
 	jumpCount = 0;
 }
 
 Player::Player(float x, float y, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale) : Character(x, y, rotation, speed, maxSpeed, internalScale)
 {
-	gravitationalAcceleration = 2000;
+	gravitationalAcceleration = DEFAULT_GRAVITATIONAL_ACCELERATION;
 	jumpVelocity = 0;
 	facing = Facing::RIGHT;
 	lockYFacing = true;
-	maxJump = 1;
+	maxJump = DEFAULT_MAX_JUMP;
 	jumpCount = 0;
 }
 
 Player::Player(float x, float y, float z, float rotation, float speed, float maxSpeed, D3DXVECTOR3 internalScale) : Character(x, y, z, rotation, speed, maxSpeed, internalScale)
 {
-	gravitationalAcceleration = 2000;
+	gravitationalAcceleration = DEFAULT_GRAVITATIONAL_ACCELERATION;
 	jumpVelocity = 0;
 	facing = Facing::RIGHT;
 	lockYFacing = true;
-	maxJump = 1;
+	maxJump = DEFAULT_MAX_JUMP;
 	jumpCount = 0;
 }
 
@@ -429,7 +430,7 @@ void Player::HandleInput(float gameTime)
 	//if (jumpCount < maxJump) {
 		if (movementVector.y >= 0 && jumpVelocity >= 0) jumpVelocity = - gravitationalAcceleration * gameTime;
 		velocity.y = - jumpVelocity;
-		jumpVelocity -= gravitationalAcceleration * gameTime;
+		jumpVelocity -= gravitationalAcceleration * gameTime /** 99999*/;
 	//}
 	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gravitationalAcceleration) + " " + std::to_string(gameTime) + " " + std::to_string(jumpVelocity) + ", " + std::to_string(velocity.y) + ", " + std::to_string(0 + (jumpStatus == JumpStatus::JUMPING)) + "\n"));
 
@@ -462,6 +463,10 @@ void Player::Update(float gameTime)
 		this->reloadTime -= gameTime;
 	}
 
+	this->prev_position = this->position;
+	prev_position.x += this->prev->spriteWidth / 2 - this->sprite->spriteWidth / 2;
+	prev_position.y += this->prev->spriteHeight - this->sprite->spriteHeight;
+
 	position.x += velocity.x * gameTime;
 	position.y += velocity.y * gameTime;
 
@@ -469,6 +474,7 @@ void Player::Update(float gameTime)
 	position.y += this->prev->spriteHeight - this->sprite->spriteHeight;
 	//}
 	//else 
+
 
 	if (status == ObjectStatus::DEAD && health > 0) 
 	{

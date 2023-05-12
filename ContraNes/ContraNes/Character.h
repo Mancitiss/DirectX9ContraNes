@@ -44,9 +44,6 @@ public:
 	virtual void SetJumpDown(bool b) = 0;
 	virtual bool GetJumpDown() const = 0;
 
-	int prevCollaped = 0;
-	int currentCollaped = 0;
-
 	std::unordered_set<GameplayObject*> ignore;
 protected:
 	int jumpCount;

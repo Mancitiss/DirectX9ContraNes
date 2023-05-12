@@ -32,6 +32,7 @@ public:
 	bool IsInitialized() const;
 
 	void SetJerkIncrementPerSecond3(float jerk);
+	D3DXVECTOR3 prev_position;
 protected:
 	LPCTSTR Name;
 	LPCTSTR Description;
