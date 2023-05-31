@@ -14,6 +14,7 @@ public:
 	void Unfollow();
 	bool IsFollowing() const;
 	void Render(GameplayObject* object, float gameTime = 0);
+	void Render2(GameplayObject* object, float gameTime = 0);
 	void Render(GameSprite* sprite, float gameTime = 0);
 	void SetLimit(float x, float y, float width, float height);
 	RECT GetBounds() const;

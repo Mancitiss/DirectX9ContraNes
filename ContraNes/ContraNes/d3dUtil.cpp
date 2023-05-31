@@ -79,3 +79,11 @@ bool CheckIntersection(RECT* const& rectA, RECT* const& rectB)
     return max(rectA->left, rectB->left) < min(rectA->right, rectB->right)
         && max(rectA->top, rectB->top) < min(rectA->bottom, rectB->bottom);
 }
+
+void FindIntersection(RECT* const& rectA, RECT* const& rectB, RECT* const& rectIntersection)
+{
+    rectIntersection->left = max(rectA->left, rectB->left);
+	rectIntersection->top = max(rectA->top, rectB->top);
+	rectIntersection->right = min(rectA->right, rectB->right);
+	rectIntersection->bottom = min(rectA->bottom, rectB->bottom);
+}

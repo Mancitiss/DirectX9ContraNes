@@ -610,7 +610,7 @@ void Player::TakeDamage(int damage)
 		else
 		{
 			this->status = ObjectStatus::DYING;
-			this->invincibilityTime = 1;
+			//this->invincibilityTime = 1;
 			if (facing == Facing::LEFT && pDieLeft) this->sprite = this->pDieLeft;
 			else if (pDieRight) this->sprite = this->pDieRight;
 		}

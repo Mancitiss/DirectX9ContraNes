@@ -140,6 +140,41 @@ void GameSprite::Draw(D3DXVECTOR3* position, D3DXVECTOR3* scaleFactors, float ro
 	}
 }
 
+void GameSprite::Draw(RECT const& src, D3DXVECTOR3* position, D3DXVECTOR3* drawPosition, D3DXVECTOR3* scaleFactors, float rotation)
+{
+	if (sprite && tex)
+	{
+		// rotation matrix
+		D3DXMATRIX mat;
+		D3DXVECTOR3 position2 = D3DXVECTOR3((position->x + spriteWidth / 2), (position->y + spriteHeight / 2), position->z);
+		D3DXQUATERNION quat;
+		// make quat
+		D3DXQuaternionRotationYawPitchRoll(&quat, 0, 0, baseZRotation + rotation);
+		D3DXMatrixAffineTransformation(&mat, 1.0f, &position2, &quat, NULL);
+
+		// scale matrix
+		D3DXMATRIX mat2;
+		D3DXMatrixScaling(&mat2, scaleFactors->x, scaleFactors->y, scaleFactors->z);
+
+		// combine the matrices
+		mat = mat * mat2;
+
+		// set the rotation
+		sprite->SetTransform(&mat);
+
+		// begin the sprite
+		sprite->Begin(D3DXSPRITE_DONOTSAVESTATE | D3DXSPRITE_SORT_DEPTH_FRONTTOBACK | D3DXSPRITE_ALPHABLEND);
+
+		// draw the sprite
+		sprite->Draw(tex, &src, NULL, drawPosition, displayColor);
+
+		// end the sprite
+		sprite->End();
+		//OutputDebugString(ConvertToLPCWSTR("" + std::to_string(position->x) + ", " + std::to_string(position->y) + "," + std::to_string(position->z) + "\n"));
+
+	}
+}
+
 LPDIRECT3DTEXTURE9 GameSprite::GetTexture() const
 {
 	return tex;

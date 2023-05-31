@@ -110,6 +110,14 @@ void GameplayObject::Draw(D3DXVECTOR3* position, D3DXVECTOR3* scaleFactors, floa
 	}
 }
 
+void GameplayObject::Draw(D3DXVECTOR3* position, D3DXVECTOR3* drawPosition, RECT const& intersection, D3DXVECTOR3* scaleFactors, float dt)
+{
+	if (sprite) {
+		//D3DXVECTOR3 scale = D3DXVECTOR3(internalScale.x * scaleFactors->x, internalScale.y * scaleFactors->y, internalScale.z * scaleFactors->z);
+		sprite->Draw(intersection, position, drawPosition, scaleFactors, rotation);
+	}
+}
+
 ObjectStatus GameplayObject::GetStatus() const
 {
 	return status;
@@ -188,4 +196,14 @@ void GameplayObject::HandleInput(float gameTime)
 void GameplayObject::SetJerkIncrementPerSecond3(float jerk)
 {
 	this->jerkIncrementPerSecond3 = jerk;
+}
+
+RECT GameplayObject::GetBounds() const
+{
+	RECT bounds;
+	bounds.left = position.x;
+	bounds.right = position.x + sprite->spriteWidth;
+	bounds.top = position.y;
+	bounds.bottom = position.y + sprite->spriteHeight;
+	return bounds;
 }

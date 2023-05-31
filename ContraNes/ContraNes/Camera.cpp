@@ -103,7 +103,25 @@ void Camera::Render(GameplayObject* object, float gameTime)
 {
 	if (object->IsInitialized()) {
 		D3DXVECTOR3 relativePosition = object->GetPosition() - this->position;
-		object->Draw(&relativePosition, &this->scaleFactors , gameTime);
+		object->Draw(&relativePosition, &this->scaleFactors, gameTime);
+	}
+}
+
+void Camera::Render2(GameplayObject* object, float gameTime)
+{
+	if (object->IsInitialized()) {
+		RECT obj = object->GetBounds();
+		RECT cam = this->GetBounds();
+		if (!CheckIntersection(&obj, &cam)) return;
+		RECT intersection = RECT();
+		FindIntersection(&obj, &cam, &intersection);
+		D3DXVECTOR3 relativePosition = object->GetPosition() - this->position;
+		D3DXVECTOR3 drawPosition = D3DXVECTOR3(intersection.left - this->position.x, intersection.top - this->position.y, relativePosition.z);
+		intersection.left = intersection.left - obj.left;
+		intersection.top = intersection.top - obj.top;
+		intersection.right = intersection.right - obj.left;
+		intersection.bottom = intersection.bottom - obj.top;
+		object->Draw(&relativePosition, &drawPosition, intersection, &this->scaleFactors, gameTime);
 	}
 }
 

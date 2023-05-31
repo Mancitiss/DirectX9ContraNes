@@ -196,19 +196,24 @@ bool App::InitObjects()
 	platforms.push_back(new StandableObject(6460, 330, 70, 50, true)); 
 	platforms.push_back(new StandableObject(6550, 70, 220 , 370, false, false)); // door
 
-	/*monsters.emplace_back(std::make_unique<Runner>(1450.0f, 140.0f, 0.0f, 200.0f, 200.0f));
-	monsters.back()->Init(m_pDevice3D, 0.15f);*/
+	monsters.emplace_back(std::make_unique<Runner>(1450.0f, 140.0f, 0.0f, 200.0f, 200.0f));
+	monsters.back()->Init(m_pDevice3D, 0.15f);
 
 	monsters.emplace_back(std::make_unique<Shooter>(1000.0f, 140.0f, 0.0f, 0.0f, 0.0f));
 	monsters.back()->Init(m_pDevice3D, 0.15f);
-	/*monsters.emplace_back(std::make_unique<Shooter>(900.0f, 140.0f, 0.0f, 0.0f, 0.0f));
+	monsters.emplace_back(std::make_unique<Shooter>(900.0f, 140.0f, 0.0f, 0.0f, 0.0f));
 	monsters.back()->Init(m_pDevice3D, 0.15f);
 	monsters.emplace_back(std::make_unique<Shooter>(1100.0f, 140.0f, 0.0f, 0.0f, 0.0f));
 	monsters.back()->Init(m_pDevice3D, 0.15f);
 	monsters.emplace_back(std::make_unique<Shooter>(1200.0f, 140.0f, 0.0f, 0.0f, 0.0f));
 	monsters.back()->Init(m_pDevice3D, 0.15f);
 	monsters.emplace_back(std::make_unique<Shooter>(1300.0f, 140.0f, 0.0f, 0.0f, 0.0f));
-	monsters.back()->Init(m_pDevice3D, 0.15f);*/
+	monsters.back()->Init(m_pDevice3D, 0.15f);
+
+	for (auto& monster : monsters)
+	{
+		monster->SetInvincibilityDelay(0);
+	}
 
 
 	background = new GameplayObject(0, 0, 1.0f, 0, 0, 0);
@@ -220,6 +225,7 @@ bool App::InitObjects()
 	player->SetJerkIncrementPerSecond3(19702.0f);
 	player->SetBaseJumpVelocity(350);
 	player->SetGravitationalAcceleration(600);
+	player->SetInvincibilityDelay(1);
 
 	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300, D3DXVECTOR3(1, 1, 1));
 	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI)) return false;
@@ -261,6 +267,46 @@ bool App::Init()
 	
 
 	return true;
+}
+
+void CheckCollision(Player* const& player, std::vector<StandableObject*> const& platforms, float gameTime)
+{
+	RECT playerRect = { (LONG)(player->prev_position.x), (LONG)(player->prev_position.y), (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
+	float playerS = (playerRect.right - playerRect.left) * (playerRect.bottom - playerRect.top);
+	D3DXVECTOR3 position = player->GetPosition();
+	bool first = true;
+	for (auto& platform : platforms)
+	{
+		RECT platformRect = platform->GetBounds();
+		if (CheckIntersection(&playerRect, &platformRect) && (player->ignore.find(platform) == player->ignore.end()))
+		{
+			OutputDebugString(ConvertToLPCWSTR(std::to_string(gameTime)));
+			platform->ApplyCollision(player, gameTime);
+			if (player->ignore.find(platform) != player->ignore.end()) continue;
+
+			float S2 = ((player->GetPosition().x + player->GetSprite()->spriteWidth - player->prev_position.x) * (player->GetPosition().y + player->GetSprite()->spriteHeight - player->prev_position.y));
+			if (std::abs(S2) < std::abs(playerS) || first)
+			{
+				playerRect = { (LONG)(player->prev_position.x), (LONG)(player->prev_position.y), (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
+				position = player->GetPosition();
+				playerS = S2;
+				first = false;
+			}
+			else
+			{
+				player->SetPositionX(position.x);
+				player->SetPositionY(position.y);
+			}
+			bool condition;
+			if (player->GetPosition().y > 149.0f) condition = true;
+			else condition = false;
+			OutputDebugString(ConvertToLPCWSTR("player y: " + std::to_string(player->GetPosition().y) + "\n"));
+		}
+		else if (player->ignore.find(platform) != player->ignore.end())
+		{
+			player->ignore.erase(platform);
+		}
+	}
 }
 
 void App::Update(float gameTime)
@@ -414,73 +460,16 @@ void App::Update(float gameTime)
 		}
 	}
 
-	RECT playerRect = { (LONG)(player->prev_position.x), (LONG)(player->prev_position.y), (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
-	float playerS = (playerRect.right - playerRect.left) * (playerRect.bottom - playerRect.top);
-	D3DXVECTOR3 position = player->GetPosition();
-	bool first = true;
-	for (auto& platform : platforms)
-	{
-		RECT platformRect = platform->GetBounds();
-		if ( CheckIntersection( &playerRect, &platformRect) && (player->ignore.find(platform) == player->ignore.end()) )
-		{
-			OutputDebugString(ConvertToLPCWSTR(std::to_string(gameTime)));
-			platform->ApplyCollision(player, gameTime);
-			if (player->ignore.find(platform) != player->ignore.end()) continue;
-			
-			float S2 = ((player->GetPosition().x + player->GetSprite()->spriteWidth - player->prev_position.x) * (player->GetPosition().y + player->GetSprite()->spriteHeight - player->prev_position.y));
-			if ( std::abs(S2) < std::abs(playerS) || first)
-			{
-				playerRect = { (LONG)(player->prev_position.x), (LONG)(player->prev_position.y), (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
-				position = player->GetPosition();
-				playerS = S2;
-				first = false;
-			}
-			else
-			{
-				player->SetPositionX(position.x);
-				player->SetPositionY(position.y);
-			}	
-			bool condition;
-			if (player->GetPosition().y > 149.0f) condition = true;
-			else condition = false;
-			OutputDebugString(ConvertToLPCWSTR("player y: " + std::to_string(player->GetPosition().y) + "\n"));
-		}
-		else if (player->ignore.find(platform) != player->ignore.end())
-		{
-			player->ignore.erase(platform);
-		}
-	}
+	CheckCollision(player, platforms, gameTime);
+	RECT playerRect = { (LONG)(player->GetPosition().x), (LONG)(player->GetPosition().y), (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight)};
+	D3DXVECTOR3 position;
 
 	for (auto& monster : monsters)
 	{
 		if (!monster || !monster->IsInitialized() || monster->GetMoveType() == MoveType::NONE) continue;
 		monster->HandleInput(gameTime);
 		monster->Update(gameTime);
-		RECT monsterRect = { (LONG)(monster->prev_position.x), (LONG)(monster->prev_position.y), (LONG)(monster->GetPosition().x + monster->GetSprite()->spriteWidth), (LONG)(monster->GetPosition().y + monster->GetSprite()->spriteHeight) };
-		float monsterS = (monsterRect.right - monsterRect.left) * (monsterRect.bottom - monsterRect.top);
-		position = monster->GetPosition();
-		for (auto& platform : platforms)
-		{
-			RECT platformRect = platform->GetBounds();
-			if (CheckIntersection(&monsterRect, &platformRect))
-			{
-				//OutputDebugString(ConvertToLPCWSTR(std::to_string(gameTime)));
-				platform->ApplyCollision(&*monster, gameTime);
-				float S2 = ((monster->GetPosition().x + monster->GetSprite()->spriteWidth - monster->prev_position.x) * (monster->GetPosition().y + monster->GetSprite()->spriteHeight - monster->prev_position.y));
-				if (std::abs(S2) < std::abs(monsterS))
-				{
-					monsterRect = { (LONG)(monster->prev_position.x), (LONG)(monster->prev_position.y), (LONG)(monster->GetPosition().x + monster->GetSprite()->spriteWidth), (LONG)(monster->GetPosition().y + monster->GetSprite()->spriteHeight) };
-					position = monster->GetPosition();
-					monsterS = S2;
-				}
-				else
-				{
-					monster->SetPositionX(position.x);
-					monster->SetPositionY(position.y - 1);
-				}
-				//OutputDebugString(ConvertToLPCWSTR("Monster y: " + std::to_string(monster->GetPosition().y) + "\n"));
-			}
-		}
+		CheckCollision(&*monster, platforms, gameTime);
 
 		if (monster->fired)
 		{
@@ -619,19 +608,20 @@ void App::Render(float gameTime)
 	m_pDevice3D->BeginScene(); 
 
 	if (camera) {
+		RECT cam = camera->GetBounds();
 		if (background && background->IsInitialized())
 		{
-			camera->Render(background);
+			camera->Render2(background);
 		}
 
 		if (player && player->IsInitialized())
 		{
-			camera->Render(player);
+			camera->Render2(player);
 		}
 
 		if (player2 && player2->IsInitialized())
 		{
-			camera->Render(player2);
+			camera->Render2(player2);
 		}
 
 		if (monsters.size() > 0)
@@ -640,7 +630,7 @@ void App::Render(float gameTime)
 			{
 				if (monster && monster->IsInitialized()) 
 				{
-					camera->Render(&*monster);
+					camera->Render2(&*monster);
 				}
 			}
 		}
@@ -651,7 +641,7 @@ void App::Render(float gameTime)
 			{
 				if (bullet && bullet->IsInitialized())
 				{
-					camera->Render(&*bullet);
+					camera->Render2(&*bullet);
 				}
 			}
 		}
@@ -662,7 +652,7 @@ void App::Render(float gameTime)
 			{
 				if (bullet && bullet->IsInitialized())
 				{
-					camera->Render(&*bullet);
+					camera->Render2(&*bullet);
 				}
 			}
 		}

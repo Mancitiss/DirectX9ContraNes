@@ -21,6 +21,7 @@ public:
 	virtual void Update(float dt);
 	virtual void Draw(float dt);
 	virtual void Draw(D3DXVECTOR3* position, D3DXVECTOR3* scaleFactors, float dt);
+	virtual void Draw(D3DXVECTOR3* position, D3DXVECTOR3* drawPosition, RECT const& intersection, D3DXVECTOR3* scaleFactors, float dt);
 
 	ObjectStatus GetStatus() const;
 	void SetStatus(ObjectStatus status) { this->status = status; }
@@ -33,6 +34,9 @@ public:
 
 	void SetJerkIncrementPerSecond3(float jerk);
 	D3DXVECTOR3 prev_position;
+
+	virtual RECT GetBounds() const;
+
 protected:
 	LPCTSTR Name;
 	LPCTSTR Description;

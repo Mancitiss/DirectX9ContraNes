@@ -9,7 +9,6 @@ class GameSprite
 {
 public:
 	GameSprite();
-	GameSprite(float x, float y);
 	~GameSprite();
 
 	// methods
@@ -17,6 +16,7 @@ public:
 	bool IsInitialized();
 	void Draw(D3DXVECTOR3 *position);
 	void Draw(D3DXVECTOR3 *position, D3DXVECTOR3* scaleFactors, float rotation);
+	void Draw(RECT const& src, D3DXVECTOR3 *position, D3DXVECTOR3* drawPosition, D3DXVECTOR3* scaleFactors, float rotation);
 	LPDIRECT3DTEXTURE9 GetTexture() const;
 	D3DXVECTOR3 GetPosition() const;
 	void SetDisplayColor(D3DCOLOR color);
