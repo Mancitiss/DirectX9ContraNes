@@ -43,13 +43,15 @@ bool CreateSprites(LPDIRECT3DDEVICE9 device, int N, const std::string& prefix, c
 
         // Create a new GameSprite with the image dimensions
         GameSprite* sprite = new GameSprite();
-        if (!sprite->Init(device, ConvertToLPCWSTR(filename), width, height, 0, internalScale))
+        LPCWSTR lpcwstr = ConvertToLPCWSTR(filename);
+        if (!sprite->Init(device, lpcwstr, width, height, 0, internalScale))
         {
             // Cleanup and return false if sprite creation fails
             delete sprite;
             delete current;
             return false;
         }
+        delete[] lpcwstr;
 
         // Set the default sprite for the current sprite
         sprite->pDefault = pDefault;

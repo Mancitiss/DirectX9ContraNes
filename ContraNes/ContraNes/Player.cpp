@@ -399,8 +399,6 @@ void Player::_HandleDirection(D3DXVECTOR3& directionVector)
 				else this->sprite = this->pIdleUp;
 			}
 		}
-		//OutputDebugString(ConvertToLPCWSTR(std::to_string(directionVector.x) + " " + std::to_string(directionVector.y) + "\n"));
-
 		this->currentDirection = directionVector;
 	}
 	else
@@ -432,8 +430,6 @@ void Player::HandleInput(float gameTime)
 		velocity.y = - jumpVelocity;
 		jumpVelocity -= gravitationalAcceleration * gameTime /** 99999*/;
 	//}
-	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gravitationalAcceleration) + " " + std::to_string(gameTime) + " " + std::to_string(jumpVelocity) + ", " + std::to_string(velocity.y) + ", " + std::to_string(0 + (jumpStatus == JumpStatus::JUMPING)) + "\n"));
-
 	this->prev = this->sprite;
 
 	if (status != ObjectStatus::ACTIVE) return;

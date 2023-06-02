@@ -48,6 +48,7 @@ ContraApp::~ContraApp()
 		m_pDirect3D = NULL; 
 	}
 
+	delete[] m_LAppTitle;
 }
 
 int ContraApp::Run()

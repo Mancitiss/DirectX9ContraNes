@@ -80,8 +80,6 @@ void Camera::Update(float dt)
 			this->position.y = y;
 		}
 	}
-
-	//OutputDebugString(ConvertToLPCWSTR("" + std::to_string(position.x) + ", " + std::to_string(position.y) +"\n"));
 }
 
 void Camera::Follow(GameplayObject* following)

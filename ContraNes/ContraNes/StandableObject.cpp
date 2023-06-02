@@ -52,7 +52,7 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 		object->ResetJumpCount();
 		//object->SetJumpState(JumpStatus::IDLE);
 		object->SetJumpDown(false);
-		OutputDebugString(L"Up");
+		OutputDebugString(L" Up ");
 	}
 	else // object->GetPosition().y + object->GetSprite()->spriteHeight - changedY > platformPosition.y
 	{

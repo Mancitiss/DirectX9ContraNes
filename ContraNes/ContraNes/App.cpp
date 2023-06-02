@@ -58,6 +58,7 @@ App::~App()
 	playerBullets.clear();
 	monsterBullets.clear();
 
+	delete[] message;
 }
 
 int App::Run()
@@ -89,19 +90,27 @@ int App::Run()
 
 void App::_Run() 
 {
-	//static constexpr float kTargetFrameTime = 1.0f / 60.0f; // 60 FPS
-	//static float sAccumulatedTime = 0.0f;
+	// this is not 60 fps 
+	// but more like a largest time unit for update and render
+	// anything larger than this will be split into smaller time units
+	static constexpr float kTargetFrameTime = 1.0f / 60.0f; 
 
-	//gameTime->Update();
+	static float sAccumulatedTime = 0.0f;
+	static float renderTime = 0.0f;
 
-	//sAccumulatedTime += gameTime->elapsedGameTime;
-	//while ( sAccumulatedTime >= kTargetFrameTime )
-	//{
-	//	Update(kTargetFrameTime);
-	//	Render(kTargetFrameTime);
+	gameTime->Update();
 
-	//	sAccumulatedTime -= kTargetFrameTime;
-	//}
+	sAccumulatedTime += gameTime->elapsedGameTime;
+	renderTime = sAccumulatedTime;
+	while ( sAccumulatedTime >= kTargetFrameTime )
+	{
+		Update(kTargetFrameTime);
+		//Render(kTargetFrameTime);
+
+		sAccumulatedTime -= kTargetFrameTime;
+	}
+	Update(sAccumulatedTime);
+	Render(renderTime);
 
 
 	// max fps
@@ -122,29 +131,29 @@ void App::_Run()
 
 
 	// max fps without sleep
-	static constexpr float kMaxFrameTime = 1.0f / 60.0f; // max FPS
+	//static constexpr float kMaxFrameTime = 1.0f / 60.0f; // max FPS
 
-	gameTime->Update();
+	//gameTime->Update();
 
-	const float deltaTime = gameTime->elapsedGameTime;
-	if (deltaTime < kMaxFrameTime)
-	{
-		// Calculate the time to wait
-		const DWORD waitTime = static_cast<DWORD>((kMaxFrameTime - deltaTime) * 1000.0f);
+	//const float deltaTime = gameTime->elapsedGameTime;
+	//if (deltaTime < kMaxFrameTime)
+	//{
+	//	// Calculate the time to wait
+	//	const DWORD waitTime = static_cast<DWORD>((kMaxFrameTime - deltaTime) * 1000.0f);
 
-		// Create and set the timer
-		HANDLE hTimer = CreateWaitableTimer(NULL, FALSE, NULL);
-		LARGE_INTEGER dueTime;
-		dueTime.QuadPart = -static_cast<LONGLONG>(waitTime) * 10000LL;
-		SetWaitableTimer(hTimer, &dueTime, 0, NULL, NULL, FALSE);
+	//	// Create and set the timer
+	//	HANDLE hTimer = CreateWaitableTimer(NULL, FALSE, NULL);
+	//	LARGE_INTEGER dueTime;
+	//	dueTime.QuadPart = -static_cast<LONGLONG>(waitTime) * 10000LL;
+	//	SetWaitableTimer(hTimer, &dueTime, 0, NULL, NULL, FALSE);
 
-		// Wait for the timer to expire
-		WaitForSingleObject(hTimer, INFINITE);
-		CloseHandle(hTimer);
-	}
-	if (deltaTime > 0.25f) return; // pause the game when the game is stopped / or below 4 fps (0.25s)
-	Update(deltaTime);
-	Render(deltaTime);
+	//	// Wait for the timer to expire
+	//	WaitForSingleObject(hTimer, INFINITE);
+	//	CloseHandle(hTimer);
+	//}
+	//if (deltaTime > 0.25f) return; // pause the game when the game is stopped / or below 4 fps (0.25s)
+	//Update(deltaTime);
+	//Render(deltaTime);
 	
 }
 
@@ -226,6 +235,7 @@ bool App::InitObjects()
 	player->SetBaseJumpVelocity(350);
 	player->SetGravitationalAcceleration(600);
 	player->SetInvincibilityDelay(1);
+	player->SetHealth(100);
 
 	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300, D3DXVECTOR3(1, 1, 1));
 	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI)) return false;
@@ -255,7 +265,7 @@ bool App::Init()
 		return false;
 
 	font = NULL;
-	message = L"Hello World!";
+	message = new wchar_t[1] {0};
 	HRESULT hr = D3DXCreateFont(m_pDevice3D, 19, 0, FW_NORMAL, 1, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Arial", &font);
 	if (FAILED(hr)) 
 	{
@@ -280,7 +290,9 @@ void CheckCollision(Player* const& player, std::vector<StandableObject*> const& 
 		RECT platformRect = platform->GetBounds();
 		if (CheckIntersection(&playerRect, &platformRect) && (player->ignore.find(platform) == player->ignore.end()))
 		{
-			OutputDebugString(ConvertToLPCWSTR(std::to_string(gameTime)));
+			LPCWSTR str = ConvertToLPCWSTR(std::to_string(gameTime));
+			OutputDebugString(str);
+			delete[] str;
 			platform->ApplyCollision(player, gameTime);
 			if (player->ignore.find(platform) != player->ignore.end()) continue;
 
@@ -300,7 +312,9 @@ void CheckCollision(Player* const& player, std::vector<StandableObject*> const& 
 			bool condition;
 			if (player->GetPosition().y > 149.0f) condition = true;
 			else condition = false;
-			OutputDebugString(ConvertToLPCWSTR("player y: " + std::to_string(player->GetPosition().y) + "\n"));
+			LPCWSTR str2 = ConvertToLPCWSTR(std::to_string(condition));
+			OutputDebugString(str2);
+			delete[] str2;
 		}
 		else if (player->ignore.find(platform) != player->ignore.end())
 		{
@@ -341,7 +355,7 @@ void App::Update(float gameTime)
 				// facing
 				if (player->GetFacing() == Facing::RIGHT)
 				{
-// right
+					// right
 					playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x + player->GetSprite()->spriteWidth, player->GetPosition().y + player->GetSprite()->spriteHeight / 4));
 					playerBullets.back()->Init(m_pDevice3D);
 				}
@@ -515,7 +529,7 @@ void App::Update(float gameTime)
 			if (monster && monster->IsInitialized() && monster->GetStatus() == ObjectStatus::ACTIVE)
 			{
 				// log monster position
-				//OutputDebugString(ConvertToLPCWSTR("M: " + std::to_string(monster->GetPosition().x) + " " + std::to_string(monster->GetPosition().y) + ""));
+				//OutputDebugString(ConvertToWString("M: " + std::to_string(monster->GetPosition().x) + " " + std::to_string(monster->GetPosition().y) + "").c_str());
 				RECT monsterRect = { (LONG)monster->GetPosition().x, (LONG)monster->GetPosition().y, (LONG)(monster->GetPosition().x + monster->GetSprite()->spriteWidth), (LONG)(monster->GetPosition().y + monster->GetSprite()->spriteHeight) };
 				if (CheckIntersection(&monsterRect, &cam) && monster->GetMoveType() == MoveType::NONE)
 				{
@@ -593,10 +607,6 @@ void App::Update(float gameTime)
 	{
 		player->SetPositionX(0);
 	}
-
-	//OutputDebugString(ConvertToLPCWSTR("Camera position: " + std::to_string(camera->GetBounds().left) + " " + std::to_string(camera->GetBounds().top) + "\n"));
-
-	//OutputDebugString(ConvertToLPCWSTR(std::to_string(gameTime) + "\n"));
 }
 
 void App::Render(float gameTime)
@@ -658,17 +668,28 @@ void App::Render(float gameTime)
 		}
 	}
 
+	static constexpr float displayTimeDelay = 0.1f;
+	static float displayTime = 0.0f;
+	displayTime += gameTime;
 	if (font && debugMode) {
-		message = ConvertToLPCWSTR("Player Top Left: " + std::to_string(player->GetPosition().x) + " " 
-			+ std::to_string(player->GetPosition().y) + "\n" + "Player Bottom Right: " 
-			+ std::to_string(player->GetPosition().x + player->GetSprite()->spriteWidth) + " " 
-			+ std::to_string(player->GetPosition().y + player->GetSprite()->spriteHeight)
-		    /*camera position and size*/
-			+ "\n" + "Camera Top Left: " + std::to_string(camera->GetBounds().left) + " " + std::to_string(camera->GetBounds().top) 
-			+ "\n" + "Camera Bottom Right: " + std::to_string(camera->GetBounds().right) + " " + std::to_string(camera->GetBounds().bottom)
-			+ "\n" + "Player health: " + std::to_string(player->GetHealth())
-			+ "\n" + "FPS: " + std::to_string(1 / gameTime)
-		);
+		if (displayTime >= displayTimeDelay) {
+			// at the start message is assigned with wchar_t[1]{0} so we can delete it
+			// the assignment is done in App::Init() function
+			delete[] message; 
+			LPCWSTR s = ConvertToLPCWSTR(
+				"Player Top Left: " + std::to_string(player->GetPosition().x) + " " 
+				+ std::to_string(player->GetPosition().y) + "\n" + "Player Bottom Right: "
+				+ std::to_string(player->GetPosition().x + player->GetSprite()->spriteWidth) + " "
+				+ std::to_string(player->GetPosition().y + player->GetSprite()->spriteHeight)
+				/*camera position and size*/
+				+ "\n" + "Camera Top Left: " + std::to_string(camera->GetBounds().left) + " " + std::to_string(camera->GetBounds().top)
+				+ "\n" + "Camera Bottom Right: " + std::to_string(camera->GetBounds().right) + " " + std::to_string(camera->GetBounds().bottom)
+				+ "\n" + "Player health: " + std::to_string(player->GetHealth())
+				+ "\n" + "FPS: " + std::to_string(1 / gameTime)
+			);
+			message = s;
+			displayTime = 0.0f;
+		}
 		font->DrawTextW(NULL, message, -1, &messageRect, DT_LEFT, D3DCOLOR_ARGB(255, 255, 255, 0));
 	}
 

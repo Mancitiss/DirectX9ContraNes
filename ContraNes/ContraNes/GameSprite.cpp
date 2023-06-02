@@ -135,8 +135,6 @@ void GameSprite::Draw(D3DXVECTOR3* position, D3DXVECTOR3* scaleFactors, float ro
 
 		// end the sprite
 		sprite->End();
-		//OutputDebugString(ConvertToLPCWSTR("" + std::to_string(position->x) + ", " + std::to_string(position->y) + "," + std::to_string(position->z) + "\n"));
-
 	}
 }
 
@@ -170,8 +168,6 @@ void GameSprite::Draw(RECT const& src, D3DXVECTOR3* position, D3DXVECTOR3* drawP
 
 		// end the sprite
 		sprite->End();
-		//OutputDebugString(ConvertToLPCWSTR("" + std::to_string(position->x) + ", " + std::to_string(position->y) + "," + std::to_string(position->z) + "\n"));
-
 	}
 }
 
