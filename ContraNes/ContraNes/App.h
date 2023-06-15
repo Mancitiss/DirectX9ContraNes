@@ -10,6 +10,7 @@
 #include "Bullet.h"
 #include <list>
 #include <memory>
+#include "Level.h"
 
 class App : public ContraApp
 {
@@ -28,6 +29,8 @@ public:
 	void Update(float dt) override;
 	void Render(float gameTime) override;
 
+	void LoadLevel(int level);
+
 	// initilize game objects
 	bool InitObjects();
 
@@ -38,7 +41,7 @@ private:
 	Player* player;
 
 	std::vector<StandableObject*> platforms;
-	std::list<std::unique_ptr<Monster>> monsters;
+	std::list<Monster*> monsters;
 	std::list<std::unique_ptr<Bullet>> playerBullets;
 	std::list<std::unique_ptr<Bullet>> monsterBullets;
 
@@ -46,6 +49,11 @@ private:
 	ID3DXFont* font;
 	LPCWSTR message;
 	RECT messageRect;
+
+	int levelCounter;
+	Level* level;
+	D3DXVECTOR3 currentSection;
+	D3DXVECTOR3 previousSection;
 
 	int width;
 	int height;

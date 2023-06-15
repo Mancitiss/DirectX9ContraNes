@@ -6,6 +6,7 @@
 #include "d3dUtil.h"
 #include "Runner.h"
 #include "Shooter.h"
+#include "Level1.h"
 
 App::App(HINSTANCE hInstance) : ContraApp(hInstance)
 {
@@ -45,14 +46,8 @@ App::~App()
 		font->Release();
 		font = nullptr;
 	}
-	for (auto& platform : platforms)
-	{
-		if (platform)
-		{
-			delete platform;
-			platform = nullptr;
-		}
-	}
+
+	platforms.clear();
 
 	monsters.clear();
 	playerBullets.clear();
@@ -161,74 +156,6 @@ ID3DXSprite* pSprite;
 
 bool App::InitObjects()
 {
-	platforms.push_back(new StandableObject(-100, 480, 10000, 1000, false)); // 0
-	platforms.push_back(new StandableObject(50, 210, 1450, 50, true)); // 1
-	platforms.push_back(new StandableObject(300, 270, 200, 50, true));
-	platforms.push_back(new StandableObject(500, 340, 60, 50, true));
-	platforms.push_back(new StandableObject(560, 400, 130, 50, true));
-	platforms.push_back(new StandableObject(690, 340, 60, 50, true)); // 5
-	platforms.push_back(new StandableObject(800, 270, 140, 50, true));
-	platforms.push_back(new StandableObject(1190, 400, 140, 50, true));
-	platforms.push_back(new StandableObject(1250, 300, 190, 150, true));
-	platforms.push_back(new StandableObject(1750, 210, 320, 150, true));
-	platforms.push_back(new StandableObject(2320, 210, 500, 160, true)); // 10
-	platforms.push_back(new StandableObject(2700, 150, 1000, 250, true));
-	platforms.push_back(new StandableObject(2760, 390, 200, 30, true));
-	platforms.push_back(new StandableObject(2950, 300, 120, 90, true));
-	platforms.push_back(new StandableObject(3130, 270, 400, 80, true));
-	platforms.push_back(new StandableObject(3390, 390, 360, 30, true)); // 15
-	platforms.push_back(new StandableObject(3680, 200, 390, 50, true));
-	platforms.push_back(new StandableObject(3760, 330, 120, 50, true));
-	platforms.push_back(new StandableObject(3950, 330, 120, 50, true));
-	platforms.push_back(new StandableObject(4010, 140, 310, 50, true));
-	platforms.push_back(new StandableObject(4130, 300, 70, 50, true)); // 20
-	platforms.push_back(new StandableObject(4260, 270, 190, 50, true));
-	platforms.push_back(new StandableObject(4380, 210, 120, 50, true));
-	platforms.push_back(new StandableObject(4580, 270, 120, 50, true));
-	platforms.push_back(new StandableObject(4640, 210, 120, 50, true));
-	platforms.push_back(new StandableObject(4830, 270, 120, 50, true)); // 25
-	platforms.push_back(new StandableObject(4830, 390, 60, 50, true));
-	platforms.push_back(new StandableObject(4890, 330, 180, 50, true));
-	platforms.push_back(new StandableObject(5070, 210, 110, 50, true));
-	platforms.push_back(new StandableObject(5140, 390, 60, 50, true));
-	platforms.push_back(new StandableObject(5070, 140, 240, 50, true)); // 30
-	platforms.push_back(new StandableObject(5200, 300, 60, 50, true));
-	platforms.push_back(new StandableObject(5330, 210, 110, 50, true));
-	platforms.push_back(new StandableObject(5390, 270, 310, 50, true));
-	platforms.push_back(new StandableObject(5570, 390, 190, 50, true));
-	platforms.push_back(new StandableObject(5820, 330, 130, 50, true)); // 35
-	platforms.push_back(new StandableObject(6020, 270, 120, 50, true)); 
-	platforms.push_back(new StandableObject(6140, 210, 250, 50, true));
-	platforms.push_back(new StandableObject(6140, 390, 480, 50, true));
-	platforms.push_back(new StandableObject(6210, 300, 180, 50, true));
-	platforms.push_back(new StandableObject(6390, 270, 70, 50, true)); // 40
-	platforms.push_back(new StandableObject(6460, 330, 70, 50, true)); 
-	platforms.push_back(new StandableObject(6550, 70, 220 , 370, false, false)); // door
-
-	monsters.emplace_back(std::make_unique<Runner>(1450.0f, 140.0f, 0.0f, 200.0f, 200.0f));
-	monsters.back()->Init(m_pDevice3D, 0.15f);
-
-	monsters.emplace_back(std::make_unique<Shooter>(1000.0f, 140.0f, 0.0f, 0.0f, 0.0f));
-	monsters.back()->Init(m_pDevice3D, 0.15f);
-	monsters.emplace_back(std::make_unique<Shooter>(900.0f, 140.0f, 0.0f, 0.0f, 0.0f));
-	monsters.back()->Init(m_pDevice3D, 0.15f);
-	monsters.emplace_back(std::make_unique<Shooter>(1100.0f, 140.0f, 0.0f, 0.0f, 0.0f));
-	monsters.back()->Init(m_pDevice3D, 0.15f);
-	monsters.emplace_back(std::make_unique<Shooter>(1200.0f, 140.0f, 0.0f, 0.0f, 0.0f));
-	monsters.back()->Init(m_pDevice3D, 0.15f);
-	monsters.emplace_back(std::make_unique<Shooter>(1300.0f, 140.0f, 0.0f, 0.0f, 0.0f));
-	monsters.back()->Init(m_pDevice3D, 0.15f);
-
-	for (auto& monster : monsters)
-	{
-		monster->SetInvincibilityDelay(0);
-	}
-
-
-	background = new GameplayObject(0, 0, 1.0f, 0, 0, 0);
-	if (!background->Init(m_pDevice3D, L"resources/l1.png", 6771, 480)) return false;
-	camera->SetLimit(background->GetPosition().x, background->GetPosition().y, background->GetSprite()->spriteWidth * 1.0f, background->GetSprite()->spriteHeight * 1.0f);
-
 	player = new Player(100, 5, 0, (float)0, 200, 200, D3DXVECTOR3(2, 2, 1));
 	if (!player->Init(m_pDevice3D, 0.15f)) return false;
 	player->SetJerkIncrementPerSecond3(19702.0f);
@@ -236,6 +163,9 @@ bool App::InitObjects()
 	player->SetGravitationalAcceleration(600);
 	player->SetInvincibilityDelay(1);
 	player->SetHealth(100);
+
+	currentSection = D3DXVECTOR3(player->GetPosition().x / camera->GetWidth(), player->GetPosition().y / camera->GetHeight(), 0);
+	previousSection = currentSection + 1;
 
 	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300, D3DXVECTOR3(1, 1, 1));
 	if (!player2->Init(m_pDevice3D, L"resources/tank-trans.png", 67, 68, (float)M_PI)) return false;
@@ -254,10 +184,17 @@ bool App::Init()
 	D3DXVECTOR3 scale = D3DXVECTOR3((float)cWidth / 512, (float)cHeight / 480, 1.0f);
 	camera = new Camera(0, 0, 0, cWidth, cHeight, 0, scale);
 
-
 	// initialize game objects / check game object creation
 	if (!InitObjects())
 		return false;
+
+	levelCounter = 0;
+	LoadLevel(++levelCounter);
+	this->level->Init(m_pDevice3D, this->camera);
+	this->player->SetPositionX(this->level->GetStartPosition().x);
+	this->player->SetPositionY(this->level->GetStartPosition().y);
+	this->player->SetPositionZ(this->level->GetStartPosition().z);
+	this->level->GetSurroundingObjects(player->GetPosition(), this->background, this->platforms, this->monsters);
 
 	// initialize game time
 	gameTime = new GameTime();
@@ -273,8 +210,6 @@ bool App::Init()
 		return false;
 	}
 	SetRect(&messageRect, 0, 0, 500, 200);
-	
-	
 
 	return true;
 }
@@ -290,9 +225,9 @@ void CheckCollision(Player* const& player, std::vector<StandableObject*> const& 
 		RECT platformRect = platform->GetBounds();
 		if (CheckIntersection(&playerRect, &platformRect) && (player->ignore.find(platform) == player->ignore.end()))
 		{
-			LPCWSTR str = ConvertToLPCWSTR(std::to_string(gameTime));
+			/*LPCWSTR str = ConvertToLPCWSTR(std::to_string(gameTime));
 			OutputDebugString(str);
-			delete[] str;
+			delete[] str;*/
 			platform->ApplyCollision(player, gameTime);
 			if (player->ignore.find(platform) != player->ignore.end()) continue;
 
@@ -312,9 +247,9 @@ void CheckCollision(Player* const& player, std::vector<StandableObject*> const& 
 			bool condition;
 			if (player->GetPosition().y > 149.0f) condition = true;
 			else condition = false;
-			LPCWSTR str2 = ConvertToLPCWSTR(std::to_string(condition));
+			/*LPCWSTR str2 = ConvertToLPCWSTR(std::to_string(condition));
 			OutputDebugString(str2);
-			delete[] str2;
+			delete[] str2;*/
 		}
 		else if (player->ignore.find(platform) != player->ignore.end())
 		{
@@ -334,6 +269,16 @@ void App::Update(float gameTime)
 		pause = !pause;
 	}
 	if (pause) return;
+
+	currentSection = D3DXVECTOR3(player->GetPosition().x / camera->GetWidth(), player->GetPosition().y / camera->GetHeight(), 0);
+	if (currentSection != previousSection) {
+		previousSection = currentSection;
+		this->level->GetSurroundingObjects(player->GetPosition(), this->background, this->platforms, this->monsters);
+	}
+	OutputDebugString(ConvertToLPCWSTR(std::to_string(this->platforms.size())));
+	OutputDebugString(L"\n");
+	OutputDebugString(ConvertToLPCWSTR(std::to_string(this->monsters.size())));
+	OutputDebugString(L"\n");
 
 	if (player2 && player2->IsInitialized())
 	{
@@ -491,7 +436,7 @@ void App::Update(float gameTime)
 			monsterBullets.emplace_back(std::make_unique<Bullet>(monster->GetPosition().x + monster->GetSprite()->spriteWidth / 2, monster->GetPosition().y, monster->GetDirection().z));
 			monsterBullets.back()->Init(m_pDevice3D);
 		}
-
+		this->level->Update(monster);
 	}
 
 	for (auto& bullet : playerBullets)
@@ -549,7 +494,12 @@ void App::Update(float gameTime)
 				}
 			}
 		}
-		monsters.remove_if([](const std::unique_ptr<Monster>& monster) { return monster->GetStatus() == ObjectStatus::DEAD; });
+		monsters.remove_if([this](Monster*& monster) { 
+			bool remove = monster->GetStatus() == ObjectStatus::DEAD; 
+			if (!remove) return false;
+			level->Remove(monster);
+			return true;
+		});
 
 		for (auto& bullet : playerBullets)
 		{
@@ -696,4 +646,13 @@ void App::Render(float gameTime)
 	m_pDevice3D->EndScene();
 	m_pDevice3D->Present(0, 0, 0, 0);
 
+}
+
+void App::LoadLevel(int levelCounter)
+{
+	switch (levelCounter)
+	{
+	case 1:
+		this->level = new Level1();
+	}
 }

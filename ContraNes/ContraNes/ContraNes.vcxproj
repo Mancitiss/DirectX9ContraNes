@@ -147,8 +147,10 @@
     <ClCompile Include="GameSprite.cpp" />
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Level1.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Runner.cpp" />
+    <ClCompile Include="Section.cpp" />
     <ClCompile Include="Shooter.cpp" />
     <ClCompile Include="StandableObject.cpp" />
     <ClCompile Include="winmain.cpp" />
@@ -165,9 +167,12 @@
     <ClInclude Include="GameSprite.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="Level1.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Runner.h" />
+    <ClInclude Include="Section.h" />
     <ClInclude Include="Shooter.h" />
     <ClInclude Include="StandableObject.h" />
   </ItemGroup>

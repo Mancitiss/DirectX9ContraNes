@@ -140,3 +140,13 @@ RECT Camera::GetBounds() const
 	bounds.bottom = static_cast<LONG>( this->position.y + this->height / scaleFactors.y );
 	return bounds;
 }
+
+int Camera::GetWidth() const
+{
+	return this->width;
+}
+
+int Camera::GetHeight() const
+{
+	return this->height;
+}

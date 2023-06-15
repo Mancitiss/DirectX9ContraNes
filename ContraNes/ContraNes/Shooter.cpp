@@ -177,7 +177,7 @@ void Shooter::_defaultHandle(D3DXVECTOR3& movement, D3DXVECTOR3& direction)
 
 void Shooter::_HandleDirection(D3DXVECTOR3& directionVector)
 {
-	OutputDebugString(L"monster exist\n");
+	//OutputDebugString(L"monster exist\n");
 	if (currentDirection != directionVector)
 	{
 		if (directionVector.x < 0)
