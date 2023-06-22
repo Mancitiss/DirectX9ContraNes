@@ -164,7 +164,7 @@ bool App::InitObjects()
 	player->SetInvincibilityDelay(1);
 	player->SetHealth(100);
 
-	currentSection = D3DXVECTOR3(player->GetPosition().x / camera->GetWidth(), player->GetPosition().y / camera->GetHeight(), 0);
+	currentSection = { static_cast<int>(player->GetPosition().x / camera->GetWidth()), static_cast<int>(player->GetPosition().y / camera->GetHeight()), 0 };
 	previousSection = currentSection + 1;
 
 	player2 = new GameplayObject(5, 5, 0, (float)0, 100, 300, D3DXVECTOR3(1, 1, 1));
@@ -214,7 +214,7 @@ bool App::Init()
 	return true;
 }
 
-void CheckCollision(Player* const& player, std::vector<StandableObject*> const& platforms, float gameTime)
+void CheckCollision(Player* const& player, std::unordered_set<StandableObject*> const& platforms, float gameTime)
 {
 	RECT playerRect = { (LONG)(player->prev_position.x), (LONG)(player->prev_position.y), (LONG)(player->GetPosition().x + player->GetSprite()->spriteWidth), (LONG)(player->GetPosition().y + player->GetSprite()->spriteHeight) };
 	float playerS = (playerRect.right - playerRect.left) * (playerRect.bottom - playerRect.top);
@@ -270,15 +270,15 @@ void App::Update(float gameTime)
 	}
 	if (pause) return;
 
-	currentSection = D3DXVECTOR3(player->GetPosition().x / camera->GetWidth(), player->GetPosition().y / camera->GetHeight(), 0);
+	currentSection = { static_cast<int>(player->GetPosition().x / camera->GetWidth()), static_cast<int>(player->GetPosition().y / camera->GetHeight()), 0 };
 	if (currentSection != previousSection) {
 		previousSection = currentSection;
 		this->level->GetSurroundingObjects(player->GetPosition(), this->background, this->platforms, this->monsters);
 	}
-	OutputDebugString(ConvertToLPCWSTR(std::to_string(this->platforms.size())));
+	/*OutputDebugString(ConvertToLPCWSTR(std::to_string(this->platforms.size())));
 	OutputDebugString(L"\n");
 	OutputDebugString(ConvertToLPCWSTR(std::to_string(this->monsters.size())));
-	OutputDebugString(L"\n");
+	OutputDebugString(L"\n");*/
 
 	if (player2 && player2->IsInitialized())
 	{
@@ -307,7 +307,7 @@ void App::Update(float gameTime)
 				else
 				{
 					// left
-					playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x, player->GetPosition().y + player->GetSprite()->spriteHeight / 4, D3DXToRadian(180) ));
+					playerBullets.emplace_back(std::make_unique<Bullet>(player->GetPosition().x, player->GetPosition().y + player->GetSprite()->spriteHeight / 4, D3DXToRadian(180)));
 					playerBullets.back()->Init(m_pDevice3D);
 				}
 			}
@@ -371,48 +371,51 @@ void App::Update(float gameTime)
 		if (player->respawn)
 		{
 			// find direction of the map 
-			D3DXVECTOR3 dir = D3DXVECTOR3(0, 0, 0);
-			for (int i = 0; i < platforms.size() - 1; i++)
-			{
-				if (platforms[i]->GetBounds().left < platforms[i + 1]->GetBounds().left)
-				{
-					dir.x += 1;
-				}
-				else if (platforms[i]->GetBounds().left > platforms[i + 1]->GetBounds().left)
-				{
-					dir.x -= 1;
-				}
-			}
-			for (int i = 0; i < platforms.size() - 1; i++)
-			{
-				if (platforms[i]->GetBounds().top < platforms[i + 1]->GetBounds().top)
-				{
-					dir.y += 1;
-				}
-				else if (platforms[i]->GetBounds().top > platforms[i + 1]->GetBounds().top)
-				{
-					dir.y -= 1;
-				}
-			}
+			//D3DXVECTOR3 dir = D3DXVECTOR3(0, 0, 0);
+			//for (int i = 0; i < platforms.size() - 1; i++)
+			//{
+			//	if (platforms[i]->GetBounds().left < platforms[i + 1]->GetBounds().left)
+			//	{
+			//		dir.x += 1;
+			//	}
+			//	else if (platforms[i]->GetBounds().left > platforms[i + 1]->GetBounds().left)
+			//	{
+			//		dir.x -= 1;
+			//	}
+			//}
+			//for (int i = 0; i < platforms.size() - 1; i++)
+			//{
+			//	if (platforms[i]->GetBounds().top < platforms[i + 1]->GetBounds().top)
+			//	{
+			//		dir.y += 1;
+			//	}
+			//	else if (platforms[i]->GetBounds().top > platforms[i + 1]->GetBounds().top)
+			//	{
+			//		dir.y -= 1;
+			//	}
+			//}
 
-			// find the nearest platform to respawn
-			float minDistance = 1000000;
-			int minIndex = 0;
-			for (int i = 0; i < platforms.size(); i++)
-			{
-				// check if the platform is behind the player by using the direction vector above
-				D3DXVECTOR3 minus = player->GetPosition() - platforms[i]->GetPosition();
-				if (D3DXVec3Dot(&minus, &dir) < 0)
-					continue;
-				float distance = D3DXVec3Length(&minus);
-				if (distance < minDistance)
-				{
-					minDistance = distance;
-					minIndex = i;
-				}
-			}
-			player->SetPositionX(platforms[minIndex]->GetPosition().x);
-			player->SetPositionY(platforms[minIndex]->GetPosition().y);
+			//// find the nearest platform to respawn
+			//float minDistance = 1000000;
+			//int minIndex = 0;
+			//for (int i = 0; i < platforms.size(); i++)
+			//{
+			//	// check if the platform is behind the player by using the direction vector above
+			//	D3DXVECTOR3 minus = player->GetPosition() - platforms[i]->GetPosition();
+			//	if (D3DXVec3Dot(&minus, &dir) < 0)
+			//		continue;
+			//	float distance = D3DXVec3Length(&minus);
+			//	if (distance < minDistance)
+			//	{
+			//		minDistance = distance;
+			//		minIndex = i;
+			//	}
+			//}
+			//player->SetPositionX(platforms[minIndex]->GetPosition().x);
+			//player->SetPositionY(platforms[minIndex]->GetPosition().y);
+
+			player->SetPositionX(player->respawnPoint.x);
+			player->SetPositionY(player->respawnPoint.y);
 
 			player->respawn = false;
 
@@ -482,11 +485,11 @@ void App::Update(float gameTime)
 					monster->target = player;
 				}
 				//else if (!CheckIntersection(&monsterRect, &cam) && monster->GetMoveType() != MoveType::NONE)
-				else if ((monster->GetPosition().x + monster->GetSprite()->spriteWidth < cam.left - (cam.right - cam.left) || monster->GetPosition().y > cam.bottom) && monster->GetMoveType() != MoveType::NONE)
+				/*else if ((monster->GetPosition().x + monster->GetSprite()->spriteWidth < cam.left - (cam.right - cam.left) || monster->GetPosition().y > cam.bottom) && monster->GetMoveType() != MoveType::NONE)
 				{
 					monster->SetStatus(ObjectStatus::DEAD);
 					continue;
-				}
+				}*/
 
 				if (CheckIntersection(&playerRect, &monsterRect))
 				{

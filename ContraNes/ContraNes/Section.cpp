@@ -1,5 +1,6 @@
 #include "Section.h"
 #include <set>
+#include "d3dUtil.h"
 
 Section::Section()
 {
@@ -64,9 +65,10 @@ std::unordered_set<int> Section::GetPlatformKeys()
 void Section::ExportTo(std::unordered_set<Monster*>& monsters)
 {
 	monsters.insert(this->monsters.begin(), this->monsters.end());
+	//OutputDebugString(ConvertToLPCWSTR("| size: " + std::to_string(this->monsters.size())));
 }
 
-void Section::ExportTo(std::set<int>& platforms)
+void Section::ExportTo(std::unordered_set<int>& platforms)
 {
 	for (auto key : this->platformKeys)
 	{

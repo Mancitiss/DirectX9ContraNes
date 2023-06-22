@@ -49,7 +49,8 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 		object->SetVelocityX(object->GetVelocity().x + this->velocity.x);
 		object->SetVelocityY(0);
 		object->SetJumpVelocity(0);
-		object->ResetJumpCount();
+		object->ResetJumpCount();					
+		object->respawnPoint = object->GetPosition();
 		//object->SetJumpState(JumpStatus::IDLE);
 		object->SetJumpDown(false);
 		//OutputDebugString(L" Up ");
@@ -101,6 +102,7 @@ void StandableObject::ApplyCollision(Character* const& object, float gameTime)
 					object->SetVelocityY(0);
 					object->SetJumpVelocity(0);
 					object->ResetJumpCount();
+					object->respawnPoint = object->GetPosition();
 					object->SetJumpDown(false);
 				}
 			}

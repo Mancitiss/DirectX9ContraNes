@@ -45,6 +45,8 @@ public:
 	virtual bool GetJumpDown() const = 0;
 
 	std::unordered_set<GameplayObject*> ignore;
+
+	D3DXVECTOR3 respawnPoint;
 protected:
 	int jumpCount;
 	int maxJump;

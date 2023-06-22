@@ -11,6 +11,7 @@
 #include <list>
 #include <memory>
 #include "Level.h"
+#include "d3dUtil.h"
 
 class App : public ContraApp
 {
@@ -40,7 +41,7 @@ private:
 	GameplayObject* background, * player2;
 	Player* player;
 
-	std::vector<StandableObject*> platforms;
+	std::unordered_set<StandableObject*> platforms;
 	std::list<Monster*> monsters;
 	std::list<std::unique_ptr<Bullet>> playerBullets;
 	std::list<std::unique_ptr<Bullet>> monsterBullets;
@@ -52,8 +53,8 @@ private:
 
 	int levelCounter;
 	Level* level;
-	D3DXVECTOR3 currentSection;
-	D3DXVECTOR3 previousSection;
+	IntVector3 currentSection;
+	IntVector3 previousSection;
 
 	int width;
 	int height;

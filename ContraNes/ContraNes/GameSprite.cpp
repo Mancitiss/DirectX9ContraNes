@@ -1,6 +1,7 @@
 #include "GameSprite.h"
 #include "d3dUtil.h"
 //#include <DxErr.h>
+
 GameSprite::GameSprite()
 {
 	// when color is set to white, the sprite will be drawn with its original color

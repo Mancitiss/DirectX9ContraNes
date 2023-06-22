@@ -25,7 +25,7 @@ public:
 	std::unordered_set<int> GetPlatformKeys();
 
 	void ExportTo(std::unordered_set<Monster*>&);
-	void ExportTo(std::set<int>& platforms);
+	void ExportTo(std::unordered_set<int>& platforms);
 
 	bool Contain(int key);
 	bool Contain(Monster* monster);

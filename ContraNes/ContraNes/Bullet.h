@@ -20,8 +20,10 @@ protected:
 	RECT bounds;
 	float width, height;
 	int damage = 1;
-	GameSprite* prev;
-	GameSprite* pNormal;
-	GameSprite* pDying;
+	
 	float frameTime = 0.0f, frameDelay = 0.2f;
+
+	static GameSprite* prev;
+	static GameSprite* pNormal;
+	static GameSprite* pDying;
 };

@@ -59,6 +59,65 @@ void DeleteCircularList(T*& head) {
 	head = nullptr;
 }
 
+struct IntVector3
+{
+	int x;
+	int y;
+	int z;
+
+	// Addition operator overload
+	IntVector3 operator+(const IntVector3& other) const
+	{
+		return { x + other.x, y + other.y, z + other.z };
+	}
+
+	IntVector3 operator+(const int& other) const
+	{
+		return { x + other, y + other, z + other };
+	}
+
+	// Subtraction operator overload
+	IntVector3 operator-(const IntVector3& other) const
+	{
+		return { x - other.x, y - other.y, z - other.z };
+	}
+
+	IntVector3 operator-(const int& other) const
+	{
+		return { x - other, y - other, z - other };
+	}
+
+	// Multiplication operator overload (vector-scalar)
+	IntVector3 operator*(int scalar) const
+	{
+		return { x * scalar, y * scalar, z * scalar };
+	}
+
+	// Division operator overload (vector-scalar)
+	IntVector3 operator/(int scalar) const
+	{
+		return { x / scalar, y / scalar, z / scalar };
+	}
+
+	// Multiplication operator overload (scalar-vector)
+	friend IntVector3 operator*(int scalar, const IntVector3& vector)
+	{
+		return vector * scalar;
+	}
+
+	// Equality operator overload
+	bool operator==(const IntVector3& other) const
+	{
+		return x == other.x && y == other.y && z == other.z;
+	}
+
+	// Inequality operator overload
+	bool operator!=(const IntVector3& other) const
+	{
+		return !(*this == other);
+	}
+};
+
 LPCWSTR ConvertToLPCWSTR(const std::string& str);
 
 void GetPngImageDimensions(std::string& file_path, unsigned int& width, unsigned int& height);

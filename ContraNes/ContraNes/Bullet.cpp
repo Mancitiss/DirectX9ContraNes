@@ -1,6 +1,10 @@
 #include "Bullet.h"
 #include "d3dUtil.h"
 
+GameSprite* Bullet::prev = nullptr;
+GameSprite* Bullet::pNormal = nullptr;
+GameSprite* Bullet::pDying = nullptr;
+
 Bullet::Bullet(float x, float y, float rotation, float speed, float maxSpeed, float width, float height,  D3DXVECTOR3 internalScale) : GameplayObject(x, y, rotation, speed, maxSpeed, internalScale)
 {
 	this->width = width;
@@ -10,7 +14,7 @@ Bullet::Bullet(float x, float y, float rotation, float speed, float maxSpeed, fl
 
 Bullet::~Bullet()
 {
-	GameSprite* pSprite = pDying;
+	/*GameSprite* pSprite = pDying;
 	while (pSprite)
 	{
 		GameSprite* pNext = nullptr;
@@ -23,39 +27,38 @@ Bullet::~Bullet()
 	{
 		delete pNormal;
 		pNormal = nullptr;
-	}
+	}*/
 
 	sprite = nullptr;
 }
 
 bool Bullet::Init(PDIRECT3DDEVICE9 device, float frameDelay, LPCTSTR file, D3DCOLOR backColor, D3DCOLOR displayColor)
 {
-	if (!this->pNormal)
+	if (!Bullet::pNormal)
 	{
-		this->pNormal = new GameSprite();
-		if (!this->pNormal->Init(device, file, this->width, this->height, this->rotation, this->internalScale, backColor, displayColor))
+		Bullet::pNormal = new GameSprite();
+		if (!Bullet::pNormal->Init(device, file, this->width, this->height, this->rotation, this->internalScale, backColor, displayColor))
 		{
 			return false;
 		}
-		this->pNormal->pNext = this->pNormal;
-		this->pNormal->pDefault = this->pNormal;
+		Bullet::pNormal->pNext = Bullet::pNormal;
+		Bullet::pNormal->pDefault = Bullet::pNormal;
 	}
 
-	if (!this->pDying)
+	if (!Bullet::pDying)
 	{
-		if (!CreateSprites(device, 5, "resources/bullet", ".png", this->pDying, this->pDying, this->internalScale, 0))
+		if (!CreateSprites(device, 5, "resources/bullet", ".png", Bullet::pDying, Bullet::pDying, this->internalScale, 0))
 		{
 			return false;
 		}
+		GameSprite* pSprite = this->pDying;
+		while (pSprite->pNext != pDying)
+		{
+			pSprite = pSprite->pNext;
+		}
+		pSprite->pNext = pSprite;
+		pSprite->pDefault = pSprite;
 	}
-
-	GameSprite* pSprite = this->pDying;
-	while (pSprite->pNext != pDying)
-	{
-		pSprite = pSprite->pNext;
-	}
-	pSprite->pNext = pSprite;
-	pSprite->pDefault = pSprite;
 
 	this->sprite = pNormal;
 
@@ -71,7 +74,7 @@ void Bullet::ApplyCollision(Player* const& object)
 {
 	object->TakeDamage(this->GetDamage());
 	this->status = ObjectStatus::DYING;
-	this->sprite->pNext = this->pDying;
+	this->sprite->pNext = Bullet::pDying;
 }
 
 void Bullet::Update(float gameTime)

@@ -42,7 +42,7 @@ bool Level1::Init(LPDIRECT3DDEVICE9 m_pDevice3D, Camera* camera)
 	return true;
 }
 
-void Level1::GetSurroundingObjects(D3DXVECTOR3 position, GameplayObject* &background, std::vector<StandableObject*> &platforms, std::list<Monster*> &monsters)
+void Level1::GetSurroundingObjects(D3DXVECTOR3 position, GameplayObject* &background, std::unordered_set<StandableObject*> &platforms, std::list<Monster*> &monsters)
 {
 	long sWidth = sections[0][0]->GetBounds().right - sections[0][0]->GetBounds().left;
 	long sHeight = sections[0][0]->GetBounds().bottom - sections[0][0]->GetBounds().top;
@@ -64,15 +64,17 @@ void Level1::GetSurroundingObjects(D3DXVECTOR3 position, GameplayObject* &backgr
 			}
 		}
 	}
-	OutputDebugString(ConvertToLPCWSTR("keys: " + std::to_string(keys.size()) + "\n"));
 	for (auto& key : keys)
 	{
-		platforms.push_back(this->platforms[key].get());
+		platforms.insert(this->platforms[key].get());
 	}
 	for (auto& monster : monsterSet)
 	{
 		monsters.push_back(monster);
 	}
+	//OutputDebugString(ConvertToLPCWSTR("| set size: " + std::to_string(monsterSet.size()) + "\n"));
+	//OutputDebugString(ConvertToLPCWSTR("monsters: " + std::to_string(this->monsters.size()) + "\n"));
+
 }
 
 void Level1::InitPlatforms(std::unordered_map<int, std::unique_ptr<StandableObject>> &platforms)
@@ -140,8 +142,8 @@ void Level1::InitPlatforms(std::unordered_map<int, std::unique_ptr<StandableObje
 
 void Level1::InitMonsters(LPDIRECT3DDEVICE9 m_pDevice3D, std::list<std::unique_ptr<Monster>>& monsters)
 {
-	monsters.emplace_back(std::make_unique<Runner>(1450.0f, 140.0f, 0.0f, 200.0f, 200.0f));
-	monsters.back()->Init(m_pDevice3D, 0.15f);
+	/*monsters.emplace_back(std::make_unique<Runner>(1450.0f, 140.0f, 0.0f, 200.0f, 200.0f));
+	monsters.back()->Init(m_pDevice3D, 0.15f);*/
 
 	monsters.emplace_back(std::make_unique<Shooter>(1000.0f, 140.0f, 0.0f, 0.0f, 0.0f));
 	monsters.back()->Init(m_pDevice3D, 0.15f);
@@ -226,6 +228,7 @@ void Level1::Update(Monster* monster)
 			sections[i][j]->Register(monster);
 		}
 	}
+	//OutputDebugString(L"re-registered monster");
 }
 
 void Level1::Remove(StandableObject* object)
@@ -252,4 +255,6 @@ void Level1::Remove(Monster* monster)
 		}
 	}
 	this->monsters.remove_if([monster](std::unique_ptr<Monster>& m) {return m.get() == monster; });
+	//OutputDebugString(L"removed monster");
+
 }
